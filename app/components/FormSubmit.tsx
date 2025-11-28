@@ -37,7 +37,7 @@ export default function FormSubmit() {
         </div>
 
         {/* RIGHT FORM */}
-        <div className="flex-1 md:basis-1/3 flex items-center justify-center px-4 py-8 md:pr-12">
+        <div className="flex-1 md:basis-1/3 flex items-center justify-center px-4 py-8 md:pr-12 ">
           <BookingForm />
         </div>
       </div>

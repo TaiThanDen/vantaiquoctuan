@@ -10,6 +10,7 @@ export default function BookingForm({
   onToChange,
   onFromSelect,
   onToSelect,
+  className = "",
 }: {
   externalFrom?: string;
   externalTo?: string;
@@ -17,6 +18,7 @@ export default function BookingForm({
   onToChange?: (val: string) => void;
   onFromSelect?: (val: string) => void;
   onToSelect?: (val: string) => void;
+  className?: string;
 }) {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -40,7 +42,9 @@ export default function BookingForm({
   };
 
   return (
-    <div className="bg-white shadow-2xl rounded-3xl w-full max-w-xl px-6 md:px-10 py-8 md:py-12 flex flex-col justify-between">
+    <div
+      className={`bg-white shadow-2xl rounded-3xl w-full max-w-xl px-6 md:px-10 py-8 flex flex-col justify-between ${className}`}
+    >
       {/* TOP SECTION */}
       <div className="space-y-3 md:space-y-4">
         <h2 className="text-base md:text-lg font-semibold text-gray-800">
@@ -49,9 +53,9 @@ export default function BookingForm({
         <p className="text-gray-500 text-xs md:text-sm">
           Nhập thông tin chuyến hàng để được báo giá và điều xe nhanh chóng.
         </p>
-        <button className="w-full py-3 md:py-4 rounded-full bg-gray-900 text-white font-semibold text-sm md:text-base mb-1">
+        {/* <button className="w-full py-3 md:py-4 rounded-full bg-gray-900 text-white font-semibold text-sm md:text-base mb-1">
           Lên lịch vận chuyển
-        </button>
+        </button> */}
       </div>
 
       {/* INPUT LIST */}
@@ -68,7 +72,7 @@ export default function BookingForm({
           className="w-full px-4 md:px-5 py-3 md:py-4 rounded-full border border-gray-300 
           focus:ring-2 focus:ring-gray-300/60 outline-none text-sm md:text-base"
         />
-        
+
         {/* Select dịch vụ */}
         <div className="relative">
           <select

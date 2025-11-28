@@ -1,11 +1,11 @@
 "use client";
-import OrderLayout from "../components/OrderMap";
+import OrderMap from "../components/OrderMap";
 import OrderCard from "../components/OrderCard";
 
 export default function OrderPage() {
   return (
-    <div className="pt-25">
-      <OrderLayout />
+    <div className="pt-25 lg:pt-0 ">
+      <OrderMap />
       <div className="max-w-7xl mx-auto mt-10 px-4">
         <h1 className="text-3xl font-bold mb-6 text-center text-[#ff4500]">
           Lịch đặt xe

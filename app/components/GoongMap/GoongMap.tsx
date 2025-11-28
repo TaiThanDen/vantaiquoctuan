@@ -9,8 +9,8 @@ declare global {
   }
 }
 
-const MAP_API_KEY = process.env.NEXT_PUBLIC_GOONG_MAP_API_KEY!;
-const ROUTE_API_KEY = process.env.NEXT_PUBLIC_GOONG_ROUTE_API_KEY!;
+const MAP_API_KEY = process.env.NEXT_PUBLIC_GOONG_MAP_API!;
+const ROUTE_API_KEY = process.env.NEXT_PUBLIC_GOONG_ROUTE_API!;
 
 // Hàm decode polyline thủ công
 function decodePolyline(encoded: string) {

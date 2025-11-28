@@ -1,6 +1,6 @@
 import * as React from "react";
 
-const API_KEY = process.env.NEXT_PUBLIC_GOONG_ROUTE_API_KEY!;
+const API_KEY = process.env.NEXT_PUBLIC_GOONG_ROUTE_API!;
 
 export default function AutocompleteInput({
   value,

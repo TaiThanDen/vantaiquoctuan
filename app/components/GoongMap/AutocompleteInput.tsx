@@ -5,7 +5,7 @@ const API_KEY = process.env.NEXT_PUBLIC_GOONG_ROUTE_API!;
 export default function AutocompleteInput({
   value,
   onChange,
-  onSelect, // Thêm prop này
+  onSelect,
   placeholder,
 }: {
   value: string;

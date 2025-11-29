@@ -433,7 +433,7 @@ export default function GoongMap({
             ) : (
               <>
                 <Navigation className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                Tìm tuyến đường 
+                Tìm tuyến đường
               </>
             )}
           </button>

@@ -1,0 +1,17 @@
+GET http://localhost:3000/api/orders
+
+###
+
+POST http://localhost:3000/api/orders
+Content-Type: application/json
+
+{
+  "customer_name": "Test User",
+  "customer_phone": "0909000000",
+  "service_type_id": 1,
+  "weight": 10,
+  "weight_unit": "kg",
+  "from_location": "HCM",
+  "to_location": "HN",
+  "status": "new"
+}

@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useMemo, useState } from "react";
 import {
   Carousel,
   CarouselContent,
@@ -6,7 +7,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/app/components/ui/carousel";
-import { useEffect, useMemo, useState } from "react";
 import Autoplay from "embla-carousel-autoplay";
 import { type CarouselApi } from "@/app/components/ui/carousel";
 
@@ -21,7 +21,6 @@ interface SolutionItem {
 
 interface SolutionCarouselProps {
   items: SolutionItem[];
-  // Bật/tắt auto play và cấu hình thời gian trễ
   autoPlay?: boolean;
   autoPlayDelay?: number; // ms
 }
@@ -35,7 +34,6 @@ const SolutionCarousel = ({
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
 
-  // Chuẩn bị plugins theo props
   const plugins = useMemo(() => {
     if (!autoPlay) return [];
     return [
@@ -48,21 +46,17 @@ const SolutionCarousel = ({
   }, [autoPlay, autoPlayDelay]);
 
   useEffect(() => {
-    if (!api) {
-      return;
-    }
-
+    if (!api) return;
     setCount(api.scrollSnapList().length);
     setCurrent(api.selectedScrollSnap() + 1);
-
     api.on("select", () => {
       setCurrent(api.selectedScrollSnap() + 1);
     });
   }, [api]);
 
   return (
-    <div className="flex flex-col relative bg-gray-50  ">
-      {/* Tầng nền trên */}
+    <div className="flex flex-col relative bg-gray-50">
+      {/* Banner */}
       <section className="relative bg-[#ff4500] text-white h-[500px] flex flex-col items-center justify-center text-center px-4">
         <h1 className="text-5xl font-bold mb-4 drop-shadow-md z-20">
           Giải Pháp Vận Chuyển Nổi Bật
@@ -74,9 +68,38 @@ const SolutionCarousel = ({
         </p>
       </section>
 
-      {/* Carousel nổi giữa 2 tầng */}
-      <div className="relative z-30 -mt-35  md:-mt-48 w-[75%] mx-auto pb-8">
-        <div className="bg-gray-100 rounded-2xl  overflow-hidden relative">
+      {/* Mobile: Hiển thị dạng list */}
+      <div className="md:hidden w-full mx-auto pb-8 -mt-35 relative z-30">
+        <div className="flex flex-col gap-6">
+          {items.map((item, idx) => (
+            <div key={idx} className="bg-gray-100 rounded-2xl overflow-hidden">
+              <div className="bg-blue-500 text-white p-4 flex flex-col gap-4 rounded-2xl mx-3">
+                <img
+                  src={item.image}
+                  alt={item.imageAlt || item.title}
+                  className="w-full rounded-2xl h-56 object-cover "
+                />
+                <h3 className="text-xl font-bold">{item.title}</h3>
+                <p className="text-white/80 text-sm mb-2">{item.description}</p>
+                <div className="grid grid-cols-1 gap-2">
+                  {item.features.map((feature, i) => (
+                    <div
+                      key={i}
+                      className="p-2 border border-white/30 rounded-xl text-center text-xs"
+                    >
+                      {feature}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop: Carousel */}
+      <div className="hidden md:block relative z-30 -mt-35 md:-mt-48 w-[75%] mx-auto pb-8">
+        <div className="bg-gray-100 rounded-2xl overflow-hidden relative">
           <Carousel
             setApi={setApi}
             className="w-full"
@@ -90,7 +113,6 @@ const SolutionCarousel = ({
               {items.map((item, idx) => (
                 <CarouselItem key={idx}>
                   <div className="flex flex-col md:flex-row h-[520px] overflow-auto">
-                    {/* Ảnh*/}
                     <img
                       src={item.image}
                       alt={item.imageAlt || item.title}
@@ -118,13 +140,11 @@ const SolutionCarousel = ({
                 </CarouselItem>
               ))}
             </CarouselContent>
-
             <CarouselPrevious />
             <CarouselNext />
           </Carousel>
-
-          {/* Dots Indicator - Nổi trên carousel */}
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-40  ">
+          {/* Dots Indicator */}
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-40">
             <div className="flex space-x-2">
               {Array.from({ length: count }).map((_, index) => (
                 <button

@@ -11,11 +11,11 @@ export default function OrderMap() {
   const [isToSelected, setIsToSelected] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4 md:py-8 flex items-center justify-center">
+    <div
+      id="booking"
+      className=" bg-gray-50 py-4 md:py-8 flex items-center justify-center"
+    >
       <div className="w-full max-w-[1600px] mx-auto px-2 md:px-4 lg:px-12">
-        <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-8 text-center text-gray-900">
-          Đặt lịch vận chuyển
-        </h1>
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 items-stretch justify-center">
           <div className="w-full lg:flex-3 order-2 lg:order-1 h-[500px] md:h-[600px] lg:min-h-[700px]">
             <GoongMap

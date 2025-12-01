@@ -1,41 +1,69 @@
 "use client";
 import OrderMap from "../components/OrderMap";
 import OrderCard from "../components/OrderCard";
+import MiniHeroBanner from "../components/MiniHeroBanner";
+import { useOrders } from "../hooks/orders";
 
 export default function OrderPage() {
-  return (
-    <div className="pt-25 lg:pt-0 ">
-      <OrderMap />
-      <div className="max-w-7xl mx-auto mt-10 px-4">
-        <h1 className="text-3xl font-bold mb-6 text-center text-[#ff4500]">
-          Lịch đặt xe
-        </h1>
-        <OrderCard
-          from="Hồ Chí Minh"
-          to="Hà Nội"
-          startDate="25/12/2023"
-          endDate="27/12/2023"
-          serviceType="Nguyên chuyến"
-          truckType="Tải 5 tấn"
-          duration="48 giờ"
-          mode="Trực tiếp"
-          details={[
-            "Điểm lấy hàng: Bình Thạnh, HCM – 08:30",
-            "Rời kho: Thủ Đức – 09:10",
-            "Dự kiến đến Hà Nội – 27/12/2023",
-          ]}
-        />
+  const { orders, loading, error } = useOrders();
 
-        <OrderCard
-          from="Đà Nẵng"
-          to="Hải Phòng"
-          startDate="28/12/2023"
-          endDate="29/12/2023"
-          serviceType="Ghép hàng"
-          truckType="Tải 10 tấn"
-          duration="24 giờ"
-          mode="Trực tiếp"
-        />
+  return (
+    <div className="pt-3">
+      <MiniHeroBanner
+        backgroundImage="https://images.pexels.com/photos/93398/pexels-photo-93398.jpeg?cs=srgb&dl=pexels-500photos-com-15338-93398.jpg&fm=jpg"
+        title="Lịch đặt xe"
+        description="Quản lý và theo dõi tất cả các đơn hàng vận chuyển của bạn"
+        buttonText="Đặt xe ngay"
+        buttonHref="/order#booking"
+      />
+      <div>
+        <h1 className="text-2xl md:text-4xl font-bold md:my-5 pt-5 my-5 text-center text-[#ff4500]">
+          Đặt lịch vận chuyển
+        </h1>
+        <OrderMap />
+      </div>
+      <div className="max-w-7xl mx-auto mt-10 px-4 pb-10">
+        <h1 className="text-center text-4xl my-20 font-bold text-[#ff4500] ">
+          {" "}
+          Xem lịch vận chuyển{" "}
+        </h1>
+        {loading && (
+          <p className="text-center text-2xl text-gray-500">
+            Đang tải đơn hàng...
+          </p>
+        )}
+        {error && (
+          <p className="text-center text-2xl text-red-500">
+            Lỗi khi tải đơn hàng: {error}
+          </p>
+        )}
+        {!loading && orders.length === 0 && (
+          <p className="text-center text-2xl text-gray-500">
+            Chưa có đơn hàng nào.
+          </p>
+        )}
+        {!loading &&
+          !error &&
+          orders.length > 0 &&
+          orders.map((order) => (
+            <OrderCard
+              key={order.id}
+              orderId={String(order.id)}
+              from={String(order.from_location || "")}
+              to={String(order.to_location || "")}
+              serviceType={String(order.service_type_name || "Chưa xác định")}
+              truckType={
+                order.truck_type_name
+                  ? String(order.truck_type_name)
+                  : undefined
+              }
+              duration={order.duration ? String(order.duration) : undefined}
+              weight={order.weight ? Number(order.weight) : undefined}
+              weightUnit={
+                order.weight_unit ? String(order.weight_unit) : undefined
+              }
+            />
+          ))}
       </div>
     </div>
   );

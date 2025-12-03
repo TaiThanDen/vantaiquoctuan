@@ -25,14 +25,6 @@ export interface YoutubeOptions {
   width: number;
 }
 
-declare module "@tiptap/core" {
-  interface Commands<ReturnType> {
-    youtube: {
-      setYoutubeVideo: (options: { src: string }) => ReturnType;
-    };
-  }
-}
-
 export const Youtube = Node.create<YoutubeOptions>({
   name: "youtube",
 

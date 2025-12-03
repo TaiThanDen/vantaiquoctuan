@@ -4,8 +4,8 @@ import { useCallback, useState } from "react";
 import type { Editor } from "@tiptap/react";
 
 // --- Hooks ---
-import { useTiptapEditor } from "~/hooks/use-tiptap-editor";
-import { getEmbedUrlFromYoutubeUrl } from "~/components/tiptap-node/youtube-node/youtube-node-extension";
+import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { getEmbedUrlFromYoutubeUrl } from "@/components/youtube-node/youtube-node-extension";
 
 export interface UseYoutubePopoverConfig {
   editor?: Editor | null;
@@ -14,7 +14,7 @@ export interface UseYoutubePopoverConfig {
 export function useYoutubePopover({ editor }: UseYoutubePopoverConfig = {}) {
   const { editor: contextEditor } = useTiptapEditor(editor);
   const activeEditor = editor || contextEditor;
-  
+
   const [url, setUrl] = useState<string>("");
 
   const setYoutubeVideo = useCallback(() => {

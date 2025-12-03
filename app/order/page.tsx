@@ -12,7 +12,7 @@ export default function OrderPage() {
       <MiniHeroBanner
         backgroundImage="https://images.pexels.com/photos/93398/pexels-photo-93398.jpeg?cs=srgb&dl=pexels-500photos-com-15338-93398.jpg&fm=jpg"
         title="Lịch đặt xe"
-        description="Quản lý và theo dõi tất cả các đơn hàng vận chuyển của bạn"
+        description="Theo dõi tất cả các đơn hàng vận chuyển của bạn"
         buttonText="Đặt xe ngay"
         buttonHref="/order#booking"
       />
@@ -62,6 +62,11 @@ export default function OrderPage() {
               weightUnit={
                 order.weight_unit ? String(order.weight_unit) : undefined
               }
+              truckName={order.truck_name}
+              truckModel={order.truck_model}
+              truckLoad={order.truck_load}
+              truckLoadUnit={order.truck_load_unit}
+              truckLicensePlate={order.truck_license_plate}
             />
           ))}
       </div>

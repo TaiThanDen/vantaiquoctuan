@@ -8,7 +8,7 @@ import logo from "@/public/assets/logo_remove_bg-cropped.svg";
 const links = [
   { title: "Home", href: "/" },
   { title: "Lịch đặt xe", href: "/order" },
-  { title: "Xem xe", href: "/vehicles" },
+  { title: "Danh mục xe", href: "/cars" },
   { title: "Tin tức", href: "/news" },
 ];
 

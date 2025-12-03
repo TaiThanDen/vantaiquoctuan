@@ -6,6 +6,7 @@ import { FiClock } from "react-icons/fi";
 import { LuTruck, LuPackageOpen } from "react-icons/lu";
 import { TbArrowsRight } from "react-icons/tb";
 import { MdOutlineAltRoute } from "react-icons/md";
+import { FaWeightHanging } from "react-icons/fa";
 
 interface TripCardProps {
   orderId?: string;
@@ -19,6 +20,11 @@ interface TripCardProps {
   customerName?: string;
   customerPhone?: string;
   status?: string;
+  truckName?: string;
+  truckModel?: string;
+  truckLoad?: number;
+  truckLoadUnit?: string;
+  truckLicensePlate?: string | null;
 }
 
 // Helper function to truncate address
@@ -36,9 +42,12 @@ export default function TripCard({
   duration,
   weight,
   weightUnit,
+  truckName,
+  truckModel,
+  truckLoad,
+  truckLoadUnit,
+  truckLicensePlate,
 }: TripCardProps) {
-  const [open, setOpen] = useState(false);
-
   return (
     <div className="w-full bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-4">
       {/* TOP ROW */}
@@ -54,10 +63,6 @@ export default function TripCard({
               {truncateAddress(to)}
             </span>
           </h2>
-
-          <p className="text-gray-500 text-lg mb-3">
-            Trọng lượng: {weight ? ` ${weight} ${weightUnit}` : " N/A"}
-          </p>
 
           {/* ICON INFO ROW */}
           <div className="flex items-center gap-6 flex-wrap text-lg text-gray-700">
@@ -84,6 +89,13 @@ export default function TripCard({
                 {duration}
               </div>
             )}
+            {/* Weight */}
+            {weight !== undefined && (
+              <div className="flex items-center gap-1">
+                <FaWeightHanging className="text-gray-600" size={18} />
+                {weight} {weightUnit}
+              </div>
+            )}
           </div>
         </div>
 
@@ -93,6 +105,30 @@ export default function TripCard({
             Xem giá / Nhận báo giá
           </button>
         </div>
+      </div>
+
+      <div className="flex items-center gap-6 flex-wrap text-lg text-gray-700 mt-3">
+        {/* Truck details */}
+        {truckName && (
+          <div>
+            <strong>Tên xe:</strong> {truckName}
+          </div>
+        )}
+        {truckModel && (
+          <div>
+            <strong>Model:</strong> {truckModel}
+          </div>
+        )}
+        {truckLoad !== undefined && (
+          <div>
+            <strong>Tải trọng:</strong> {truckLoad} {truckLoadUnit}
+          </div>
+        )}
+        {truckLicensePlate && (
+          <div>
+            <strong>Biển số:</strong> {truckLicensePlate}
+          </div>
+        )}
       </div>
     </div>
   );

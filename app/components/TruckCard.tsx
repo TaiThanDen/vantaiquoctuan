@@ -9,7 +9,7 @@ export default function TruckCard({ truck }: TruckCardProps) {
   const firstImage =
     truck.images && truck.images.length > 0
       ? truck.images[0].url
-      : "/assets/truck-placeholder.jpg";
+      : "/assets/truck-placeholder.jpeg";
 
   return (
     <Link href={`/cars/${truck.id}`}>

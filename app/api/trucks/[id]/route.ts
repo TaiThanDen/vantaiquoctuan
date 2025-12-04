@@ -29,6 +29,32 @@ export async function GET(
   }
 }
 
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    // PUT always uses UUID
+    if (!isUUID(id)) {
+      return NextResponse.json({ error: "Invalid truck ID" }, { status: 400 });
+    }
+
+    const data = await request.json();
+    const updatedTruck = await TrucksService.update(id, data);
+
+    if (!updatedTruck) {
+      return NextResponse.json({ error: "Truck not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(updatedTruck);
+  } catch (error) {
+    console.error("Error updating truck:", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}
+
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }

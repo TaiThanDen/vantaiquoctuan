@@ -45,7 +45,15 @@ export default function BookingForm({
   React.useEffect(() => {
     fetch("/api/service-types")
       .then((res) => res.json())
-      .then((data) => setServiceTypes(data))
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setServiceTypes(data);
+        } else if (Array.isArray(data?.serviceTypes)) {
+          setServiceTypes(data.serviceTypes);
+        } else {
+          setServiceTypes([]);
+        }
+      })
       .catch(() => setServiceTypes([]));
   }, []);
 

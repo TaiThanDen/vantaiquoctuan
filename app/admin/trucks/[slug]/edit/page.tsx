@@ -1,8 +1,8 @@
 "use client";
-
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Editor from "../../Editor";
+import { useRouter, useParams } from "next/navigation";
+import { useTruck } from "@/app/hooks/trucks/getTruckBySlug";
+import Editor from "@/app/admin/Editor";
 import toast, { Toaster } from "react-hot-toast";
 
 interface TruckType {
@@ -18,8 +18,13 @@ interface ServiceType {
 const MAX_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
 
-export default function CreateTruckPage() {
+export default function EditTruckPage() {
   const router = useRouter();
+  const params = useParams();
+  const slug = params.slug as string;
+
+  const { truck, loading: loadingTruck, error: truckError } = useTruck(slug);
+
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [truckTypes, setTruckTypes] = useState<TruckType[]>([]);
@@ -31,7 +36,7 @@ export default function CreateTruckPage() {
     brand: "",
     load: "",
     load_unit: "kg",
-    description: null,
+    description: null as any,
     license_plate: "",
     year: "",
     color: "",
@@ -41,11 +46,10 @@ export default function CreateTruckPage() {
     registration_expiry: "",
     truck_type_ids: [] as string[],
     service_type_ids: [] as string[],
-    image_urls: [""],
+    image_urls: [] as string[],
   });
 
   useEffect(() => {
-    // Lấy danh sách truck types và service types
     const fetchData = async () => {
       try {
         const [truckTypesRes, serviceTypesRes] = await Promise.all([
@@ -70,21 +74,48 @@ export default function CreateTruckPage() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (truck) {
+      setFormData({
+        name: truck.name || "",
+        models: truck.models || "",
+        brand: truck.brand || "",
+        load: truck.load?.toString() || "",
+        load_unit: truck.load_unit || "kg",
+        description: truck.description || null,
+        license_plate: truck.license_plate || "",
+        year: truck.year?.toString() || "",
+        color: truck.color || "",
+        owner_name: truck.owner_name || "",
+        owner_phone: truck.owner_phone || "",
+        status: truck.status || "available",
+        registration_expiry: truck.registration_expiry || "",
+        truck_type_ids: truck.truck_types?.map((t: any) => t.id) || [],
+        service_type_ids: truck.service_types?.map((s: any) => s.id) || [],
+        image_urls: truck.images?.map((img: any) => img.url) || [],
+      });
+    }
+  }, [truck]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      if (!truck) {
+        throw new Error("Truck not found");
+      }
+
       const submitData = {
         ...formData,
         load: parseFloat(formData.load),
         year: formData.year ? parseInt(formData.year) : undefined,
         image_urls: formData.image_urls.filter((url) => url.trim() !== ""),
-        description: formData.description ? formData.description : {},
+        description: formData.description || {},
       };
 
-      const response = await fetch("/api/trucks", {
-        method: "POST",
+      const response = await fetch(`/api/trucks/${truck.id}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -93,10 +124,10 @@ export default function CreateTruckPage() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to create truck");
+        throw new Error(error.error || "Failed to update truck");
       }
 
-      toast.success("Tạo xe thành công!");
+      toast.success("Cập nhật xe thành công!");
       router.push("/admin/trucks");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Có lỗi xảy ra");
@@ -128,13 +159,6 @@ export default function CreateTruckPage() {
     });
   };
 
-  const addImageUrl = () => {
-    setFormData((prev) => ({
-      ...prev,
-      image_urls: [...prev.image_urls, ""],
-    }));
-  };
-
   const removeImageUrl = (index: number) => {
     setFormData((prev) => ({
       ...prev,
@@ -142,18 +166,7 @@ export default function CreateTruckPage() {
     }));
   };
 
-  const updateImageUrl = (index: number, value: string) => {
-    setFormData((prev) => {
-      const newUrls = [...prev.image_urls];
-      newUrls[index] = value;
-      return { ...prev, image_urls: newUrls };
-    });
-  };
-
-  const handleImageUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    index: number
-  ) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
@@ -184,16 +197,10 @@ export default function CreateTruckPage() {
         }
 
         const data = await response.json();
-        setFormData((prev) => {
-          const newUrls = [...prev.image_urls];
-          // Nếu index là cuối cùng, thêm mới
-          if (index === newUrls.length - 1 && !newUrls[index]) {
-            newUrls[index] = data.url;
-          } else {
-            newUrls.push(data.url);
-          }
-          return { ...prev, image_urls: newUrls };
-        });
+        setFormData((prev) => ({
+          ...prev,
+          image_urls: [...prev.image_urls, data.url],
+        }));
         toast.success("Upload ảnh thành công!");
       } catch (error) {
         toast.error(
@@ -205,26 +212,44 @@ export default function CreateTruckPage() {
     setUploading(false);
   };
 
-  const handleDropImage = async (
-    e: React.DragEvent<HTMLLabelElement>,
-    index: number
-  ) => {
+  const handleDropImage = async (e: React.DragEvent<HTMLLabelElement>) => {
     e.preventDefault();
     if (uploading) return;
-    const file = e.dataTransfer.files?.[0];
-    if (!file) return;
-    await handleImageUpload({ target: { files: [file] } } as any, index);
+    const files = e.dataTransfer.files;
+    if (!files) return;
+
+    const input = document.createElement("input");
+    input.type = "file";
+    input.files = files;
+    await handleImageUpload({ target: input } as any);
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
     e.preventDefault();
   };
 
+  if (loadingTruck) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ff4500]"></div>
+      </div>
+    );
+  }
+
+  if (truckError || !truck) {
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        {truckError || "Không tìm thấy xe"}
+      </div>
+    );
+  }
+
   return (
     <div className="w-full flex justify-center">
+      <Toaster position="top-right" />
       <div className="container mx-auto w-full px-4">
-        <div className="flex justify-between items-center mb-6 ">
-          <h1 className="text-3xl font-bold text-gray-800">Tạo xe mới</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-800">Cập nhật xe</h1>
           <button
             onClick={() => router.back()}
             className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-[#ff4500]"
@@ -299,8 +324,9 @@ export default function CreateTruckPage() {
                     value={formData.load}
                     onChange={handleInputChange}
                     required
+                    step="0.1"
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff4500] focus:border-transparent"
-                    placeholder="1000"
+                    placeholder="1.5"
                   />
                   <select
                     name="load_unit"
@@ -358,32 +384,18 @@ export default function CreateTruckPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Trạng thái <span className="text-red-500">*</span>
+                  Trạng thái
                 </label>
                 <select
                   name="status"
                   value={formData.status}
                   onChange={handleInputChange}
-                  required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff4500] focus:border-transparent"
                 >
                   <option value="available">Sẵn sàng</option>
                   <option value="in_use">Đang sử dụng</option>
                   <option value="maintenance">Bảo trì</option>
                 </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Hạn đăng kiểm
-                </label>
-                <input
-                  type="date"
-                  name="registration_expiry"
-                  value={formData.registration_expiry}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff4500] focus:border-transparent"
-                />
               </div>
             </div>
 
@@ -394,8 +406,7 @@ export default function CreateTruckPage() {
               <Editor
                 value={formData.description}
                 onChange={(json: any) => {
-                  console.log("EDITOR JSON:", json);
-                  setFormData((f) => ({ ...f, description: json }));
+                  setFormData((prev) => ({ ...prev, description: json }));
                 }}
               />
             </div>
@@ -491,12 +502,36 @@ export default function CreateTruckPage() {
               Hình ảnh
             </h2>
             <div className="space-y-4">
-              {/* Chỉ render 1 vùng upload ở cuối */}
+              {/* Preview các ảnh đã có */}
+              {formData.image_urls.filter(Boolean).map((url, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200"
+                >
+                  <img
+                    src={url}
+                    alt={`Preview ${index + 1}`}
+                    className="w-20 h-20 object-cover rounded border border-gray-300"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-gray-600 truncate">{url}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeImageUrl(index)}
+                    className="px-3 py-1.5 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
+                  >
+                    Xóa
+                  </button>
+                </div>
+              ))}
+
+              {/* Upload zone */}
               <div className="flex items-center justify-center w-full">
                 <label
                   htmlFor="dropzone-file"
                   className="flex flex-col items-center justify-center w-full h-48 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
-                  onDrop={(e) => handleDropImage(e, formData.image_urls.length)}
+                  onDrop={handleDropImage}
                   onDragOver={handleDragOver}
                 >
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -530,9 +565,7 @@ export default function CreateTruckPage() {
                     type="file"
                     accept="image/jpeg,image/png,image/jpg,image/webp"
                     multiple
-                    onChange={(e) =>
-                      handleImageUpload(e, formData.image_urls.length)
-                    }
+                    onChange={handleImageUpload}
                     className="hidden"
                     disabled={uploading}
                   />
@@ -565,29 +598,6 @@ export default function CreateTruckPage() {
                 </div>
               )}
             </div>
-            {/* Preview các ảnh đã upload */}
-            {formData.image_urls.filter(Boolean).map((url, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-3 my-2 p-3 bg-gray-50 rounded-lg border border-gray-200"
-              >
-                <img
-                  src={url}
-                  alt={`Preview ${index + 1}`}
-                  className="w-20 h-20 object-cover rounded border border-gray-300"
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-600 truncate">{url}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => removeImageUrl(index)}
-                  className="px-3 py-1.5 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
-                >
-                  Xóa
-                </button>
-              </div>
-            ))}
           </div>
 
           {/* Submit Button */}
@@ -601,10 +611,10 @@ export default function CreateTruckPage() {
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || uploading}
               className="px-6 py-3 bg-[#ff4500] text-white rounded-lg hover:bg-[#e63e00] disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {loading ? "Đang tạo..." : "Tạo xe"}
+              {loading ? "Đang cập nhật..." : "Cập nhật xe"}
             </button>
           </div>
         </form>

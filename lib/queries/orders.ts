@@ -17,10 +17,10 @@ export const OrderQueries = {
   insert: `
     INSERT INTO orders (
       customer_name, customer_phone, service_type_id,
-      truck_id, weight, weight_unit, from_location, to_location,
+       weight, weight_unit, from_location, to_location,
       status, create_at
     )
-    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
     RETURNING *;
   `,
 };

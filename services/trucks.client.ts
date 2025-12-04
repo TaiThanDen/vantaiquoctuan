@@ -13,10 +13,10 @@ export interface Truck {
     owner_phone: string;
     documents: any;
     status: string;
-    registration_expiry: string;
-    types: any[];
-    images: any[];
-    service_types?: any[];
+    registration_expiry?: string;
+    truck_types?: { id: string; name: string }[];
+    service_types?: { id: string; name: string }[];
+    images?: { url: string }[];
 }
 
 export class TruckClientService {
@@ -62,6 +62,30 @@ export class TruckClientService {
             throw new Error(`Failed to fetch truck: ${response.status}`);
         }
 
+        return response.json();
+    }
+
+    static async update(id: string, data: Partial<Truck>) {
+        const response = await fetch(`/api/trucks/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to update truck: ${response.status}`);
+        }
+
+        return response.json();
+    }
+
+    static async search(keyword: string, page = 1, limit = 10) {
+        const response = await fetch(`/api/trucks/search?keyword=${encodeURIComponent(keyword)}&page=${page}&limit=${limit}`);
+        if (!response.ok) {
+            throw new Error("Failed to search trucks");
+        }
         return response.json();
     }
 

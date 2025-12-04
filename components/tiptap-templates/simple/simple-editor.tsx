@@ -279,12 +279,22 @@ export function SimpleEditor({
         onError: (error) => console.error("Upload failed:", error),
       }),
     ],
-    content: value || "",
+    content: value || {
+      type: "doc",
+      content: []
+    },
     onUpdate({ editor }) {
       const json = editor.getJSON();
       onChange(json);
     },
   });
+
+  // Thêm useEffect để update content khi value thay đổi
+  useEffect(() => {
+    if (editor && value) {
+      editor.commands.setContent(value);
+    }
+  }, [editor, value]);
 
   const rect = useCursorVisibility({
     editor,

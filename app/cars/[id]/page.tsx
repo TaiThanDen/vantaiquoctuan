@@ -37,8 +37,8 @@ export default function TruckDetailPage({
 
   const mainImage =
     truck.images && truck.images.length > 0
-      ? truck.images[0].image_url
-      : "/assets/truck-placeholder.jpg";
+      ? truck.images[0].url
+      : "/assets/truck-placeholder.jpeg";
 
   return (
     <div className="pt-3">
@@ -216,13 +216,13 @@ export default function TruckDetailPage({
             )}
 
             {/* Truck Types */}
-            {truck.types && truck.types.length > 0 && (
+            {truck.truck_types && truck.truck_types.length > 0 && (
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-800 mb-3">
                   Loại xe
                 </h2>
                 <div className="flex flex-wrap gap-2">
-                  {truck.types.map((type: any) => (
+                  {truck.truck_types.map((type: any) => (
                     <span
                       key={type.id}
                       className="px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm"

@@ -246,7 +246,7 @@ export default function EditTruckPage() {
 
   return (
     <div className="w-full flex justify-center">
-      <Toaster position="top-right" />
+      <Toaster position="top-center" />
       <div className="container mx-auto w-full px-4">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800">Cập nhật xe</h1>

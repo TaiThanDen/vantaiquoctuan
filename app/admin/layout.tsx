@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { VscThreeBars } from "react-icons/vsc";
+import { useRouter } from "next/navigation";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -11,6 +12,7 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const pathname = usePathname();
+  const router = useRouter(); // Thêm dòng này
 
   const [openSidebar, setOpenSidebar] = useState(false); // Mobile open/close
   const [miniSidebar, setMiniSidebar] = useState(false); // Minified sidebar
@@ -22,6 +24,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { href: "/admin/news", label: "Quản lý tin tức", icon: "📰" },
     { href: "/admin/users", label: "Quản lý người dùng", icon: "👥" },
   ];
+
+  // Hàm xử lý logout
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      localStorage.removeItem("token");
+      document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      router.push("/admin/login");
+    } catch (err) {
+      alert("Đăng xuất thất bại!");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 ">
@@ -35,19 +49,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           >
             <span className="text-2xl">☰</span>
           </button>
-          {/* 
-          <Link href="/admin" className="text-2xl font-bold text-[#ff4500]">
-            Admin Panel
-          </Link>
-
-          <div className="flex items-center gap-4">
-            <Link href="/" className="text-gray-600 hover:text-gray-900">
-              Xem trang web
-            </Link>
-            <button className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-              Đăng xuất
-            </button>
-          </div> */}
+          {/* Nút đăng xuất */}
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 text-white rounded-lg hover:bg-red-600"
+          >
+            Đăng xuất
+          </button>
         </div>
       </nav>
 
@@ -114,6 +122,17 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 );
               })}
             </ul>
+            <button
+              onClick={handleLogout}
+              className={`
+                mt-8 w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
+                hover:bg-gray-100 text-gray-700
+                ${miniSidebar ? "justify-center" : ""}
+              `}
+            >
+              <span className="text-xl">🚪</span>
+              {!miniSidebar && <span className="font-medium">Đăng xuất</span>}
+            </button>
           </nav>
         </aside>
 

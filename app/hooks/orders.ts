@@ -1,24 +1,36 @@
-import { useState, useEffect } from "react";
-import { OrderClientService } from "@/services/order.client";
+"use client";
 
-export function useOrders() {
+import { useCallback, useEffect, useState } from "react";
+
+export function useOrders(page = 1, limit = 10) {
     const [orders, setOrders] = useState<any[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<any>(null);
 
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                setLoading(true);
-                const data = await OrderClientService.getAll();
-                setOrders(data);
-            }catch (err) {
-                setError(err instanceof Error ? err.message : "Failed to fetch orders");
-            } finally {
-                setLoading(false);
+    const fetchOrders = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await fetch(`/api/orders?page=${page}&limit=${limit}`, { cache: "no-store" });
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data?.error || `HTTP ${res.status}`);
             }
-        };
+            const list = Array.isArray(data) ? data : Array.isArray(data?.orders) ? data.orders : [];
+            setOrders(list);
+        } catch (e) {
+            setError(e);
+            setOrders([]);
+        } finally {
+            setLoading(false);
+        }
+    }, [page, limit]);
+    useEffect(() => {
         fetchOrders();
-    }, []);
-    return { orders, loading, error };
-};
+    }, [fetchOrders]);
+    const refetch = useCallback(async () => {
+        await fetchOrders();
+    }, [fetchOrders]);
+    return { orders, loading, error, refetch };
+}
+

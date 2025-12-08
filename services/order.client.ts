@@ -22,7 +22,7 @@ export class OrderClientService {
 
     // Kiểm tra xem response có nội dung không
     const text = await response.text();
-    
+
     let result;
     try {
       result = text ? JSON.parse(text) : {};
@@ -39,23 +39,48 @@ export class OrderClientService {
     return result;
   }
 
-  static async getAll() {
-    const response = await fetch("/api/orders");
-    
+  static async getAll(page = 1, limit = 10) {
+    const response = await fetch(`/api/orders?page=${page}&limit=${limit}`);
     if (!response.ok) {
       throw new Error("Failed to fetch orders");
     }
-
     return response.json();
   }
 
   static async getById(id: string) {
     const response = await fetch(`/api/orders/${id}`);
-    
+
     if (!response.ok) {
       throw new Error("Failed to fetch order");
     }
 
     return response.json();
+  }
+  static async getBySlug(slug: string) {
+    const response = await fetch(`/api/orders/slug/${slug}`);
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch order by slug");
+    }
+
+    return response.json();
+  }
+  static async update(id: string, data: any) {
+    const response = await fetch(`/api/orders/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const json = await response.json();
+    if (!response.ok) throw new Error(json?.error || "Failed to update order");
+    return json;
+  }
+  static async delete(id: string) {
+    const response = await fetch(`/api/orders/${id}`, {
+      method: "DELETE",
+    });
+    const json = await response.json();
+    if (!response.ok) throw new Error(json?.error || "Failed to delete order");
+    return json;
   }
 }

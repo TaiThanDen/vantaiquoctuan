@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import { OrderService } from "@/services/OrderService";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const orders = await OrderService.getAll();
+    const { searchParams } = new URL(req.url);
+    const page = Number(searchParams.get("page") || 1);
+    const limit = Number(searchParams.get("limit") || 10);
+    const orders = await OrderService.getAll(page, limit);
     return NextResponse.json(orders);
   } catch (error) {
     return NextResponse.json(

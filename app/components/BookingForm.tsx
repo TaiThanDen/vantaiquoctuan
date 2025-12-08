@@ -194,8 +194,8 @@ export default function BookingForm({
               focus:ring-2 focus:ring-lime-300 focus:border-lime-400 outline-none text-sm md:text-base bg-white
               appearance-none transition shadow-sm pr-7 md:pr-8"
               >
-                <option value="kg">Kg</option>
-                <option value="tan">Tấn</option>
+                <option value="Kg">Kg</option>
+                <option value="Tấn ">Tấn</option>
               </select>
               <RiArrowDropDownLine className="absolute right-1 md:right-2 top-1/2 -translate-y-1/2 text-lg md:text-xl text-gray-400 pointer-events-none" />
             </div>

@@ -12,7 +12,7 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const pathname = usePathname();
-  const router = useRouter(); // Thêm dòng này
+  const router = useRouter();
 
   const [openSidebar, setOpenSidebar] = useState(false); // Mobile open/close
   const [miniSidebar, setMiniSidebar] = useState(false); // Minified sidebar

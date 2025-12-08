@@ -17,7 +17,6 @@ export async function GET(request: NextRequest) {
         const trucks = await TrucksService.search(keyword, page, limit);
         return NextResponse.json(trucks);
     } catch (error) {
-        console.error("Error searching trucks:", error);
         return NextResponse.json({ error: "Server error" }, { status: 500 });
     }
 }

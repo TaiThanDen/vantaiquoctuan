@@ -49,11 +49,13 @@ export default function GoongMap({
   externalTo = "",
   externalIsFromSelected = false,
   externalIsToSelected = false,
+  className = "",
 }: {
   externalFrom?: string;
   externalTo?: string;
   externalIsFromSelected?: boolean;
   externalIsToSelected?: boolean;
+  className?: string;
 }) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<any>(null);
@@ -192,7 +194,6 @@ export default function GoongMap({
       // Zoom vào tuyến đường với padding
       map.current.fitBounds([fromCoord, toCoord], { padding: 80 });
     } catch (error) {
-      console.error("Error drawing route:", error);
     } finally {
       setIsLoading(false);
     }
@@ -288,7 +289,7 @@ export default function GoongMap({
   }, []);
 
   return (
-    <div className="relative w-full h-full">
+    <div className={`relative w-full h-full ${className}`}>
       {/* Nút toggle panel - Hiện khi panel đóng */}
       {!isPanelOpen && (
         <button
@@ -441,7 +442,11 @@ export default function GoongMap({
       )}
 
       {/* Map container */}
-      <div ref={mapContainer} className="w-full h-full rounded-lg" />
+      <div
+        ref={mapContainer}
+        className="w-full h-full rounded-lg"
+        style={{ minHeight: "100%", height: "100%" }}
+      />
     </div>
   );
 }

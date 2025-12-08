@@ -65,7 +65,6 @@ export default function LoginPage() {
       }
     } catch (err) {
       toast.error("Lỗi kết nối. Vui lòng thử lại.");
-      console.error(err);
     } finally {
       setIsLoading(false);
     }

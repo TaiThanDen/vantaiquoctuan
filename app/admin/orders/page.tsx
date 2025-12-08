@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { use, useMemo, useState } from "react";
 import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
 import ConfirmDialog from "@/app/components/ConfirmDialog";
 import { useOrders } from "@/app/hooks/orders";
 import { OrderClientService } from "@/services/order.client";
+import { useOrderSearch } from "@/app/hooks/orders";
 
 type OrderStatus = "pending" | "completed" | "cancelled";
 
@@ -19,7 +20,7 @@ type Order = {
   weight_type?: string;
   from_location?: string;
   to_location?: string;
-  eta?: string;
+  duration?: string;
 
   service_type_name?: string;
   status: OrderStatus;
@@ -29,6 +30,8 @@ export default function OrdersPage() {
   const [page, setPage] = useState(1);
   const limit = 10;
   const { orders, loading, error, refetch } = useOrders(page, limit);
+  const search = useOrderSearch(limit);
+  const isSearchMode = search.hasKeyword;
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingOrder, setPendingOrder] = useState<{
@@ -36,43 +39,8 @@ export default function OrdersPage() {
     customer_name?: string;
   } | null>(null);
 
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const [searchResults, setSearchResults] = useState<Order[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-
-  const displayOrders = useMemo(() => {
-    return searchKeyword.trim() ? searchResults : (orders as Order[]);
-  }, [orders, searchKeyword, searchResults]);
-
-  const handleSearch = (keyword: string) => {
-    setIsSearching(true);
-    setTimeout(() => {
-      const lower = keyword.toLowerCase();
-      const list = (orders as Order[]) ?? [];
-      setSearchResults(
-        list.filter(
-          (o) =>
-            (o.customer_name ?? "").toLowerCase().includes(lower) ||
-            (o.customer_phone ?? "").toLowerCase().includes(lower) ||
-            (o.from_location ?? "").toLowerCase().includes(lower) ||
-            (o.to_location ?? "").toLowerCase().includes(lower) ||
-            (o.service_type_name ?? "").toLowerCase().includes(lower)
-        )
-      );
-      setIsSearching(false);
-    }, 250);
-  };
-
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const keyword = e.target.value;
-    setSearchKeyword(keyword);
-    if (keyword.trim()) handleSearch(keyword.trim());
-    else setSearchResults([]);
-  };
-
-  const clearSearch = () => {
-    setSearchKeyword("");
-    setSearchResults([]);
+    search.setKeyword(e.target.value);
   };
 
   const handleDeleteClick = (id: string | number, customer_name?: string) => {
@@ -100,12 +68,18 @@ export default function OrdersPage() {
 
       toast.dismiss(toastId);
       toast.success("Xóa đơn hàng thành công!");
+      await refetch();
       setPendingOrder(null);
     } catch (error: any) {
       toast.dismiss(toastId);
       toast.error(`Lỗi xóa đơn hàng: ${error?.message || "Đã có lỗi xảy ra"}`);
     }
   };
+  const displayOrders = useMemo(() => {
+    return search.hasKeyword
+      ? (search.results as Order[])
+      : (orders as Order[]);
+  }, [search.hasKeyword, search.results, orders]);
 
   const statusBadgeClass = (status: OrderStatus) => {
     const base =
@@ -121,7 +95,7 @@ export default function OrdersPage() {
     return "Đã hủy";
   };
 
-  if (loading || isSearching) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ff4500]" />
@@ -170,10 +144,10 @@ export default function OrdersPage() {
       <div className="w-full flex justify-between items-center mb-3 mt-1 pl-3">
         <div>
           <h3 className="text-lg font-semibold text-gray-800">
-            {searchKeyword.trim() && (
+            {search.hasKeyword && (
               <span className="text-sm text-gray-500 ml-2">
                 Tìm thấy {displayOrders.length} kết quả cho &quot;
-                {searchKeyword}&quot;
+                {search.keyword}&quot;
               </span>
             )}
           </h3>
@@ -184,15 +158,15 @@ export default function OrdersPage() {
             <input
               className="bg-white w-full pr-11 h-10 pl-3 py-2 placeholder:text-gray-400 text-gray-700 text-sm border border-gray-200 rounded transition duration-200 ease focus:outline-none focus:border-gray-400 hover:border-gray-400 shadow-sm focus:shadow-md"
               placeholder="Tìm kiếm đơn hàng..."
-              value={searchKeyword}
-              onChange={handleSearchChange}
+              value={search.keyword}
+              onChange={(e) => search.setKeyword(e.target.value)}
             />
 
-            {searchKeyword && (
+            {search.keyword && (
               <button
                 className="absolute h-8 w-8 right-10 top-1 flex items-center justify-center bg-white rounded hover:bg-gray-100"
                 type="button"
-                onClick={clearSearch}
+                onClick={() => search.setKeyword("")}
                 aria-label="Clear search"
               >
                 <svg
@@ -302,7 +276,7 @@ export default function OrdersPage() {
             {displayOrders.length === 0 ? (
               <tr>
                 <td colSpan={10} className="p-8 text-center text-gray-500">
-                  {searchKeyword.trim()
+                  {search.keyword.trim()
                     ? "Không tìm thấy đơn hàng nào phù hợp"
                     : "Chưa có đơn hàng nào"}
                 </td>
@@ -344,7 +318,7 @@ export default function OrdersPage() {
                   </td>
 
                   <td className="p-4 py-5 text-sm text-gray-700 whitespace-nowrap">
-                    {order.eta ?? "—"}
+                    {order.duration ?? "—"}
                   </td>
 
                   <td className="p-4 py-5 text-sm text-gray-700">
@@ -396,21 +370,25 @@ export default function OrdersPage() {
 
           <div className="flex space-x-1">
             <button
-              className="px-3 py-1 min-w-9 min-h-9 text-sm font-normal text-gray-500 bg-white border border-gray-200 rounded hover:bg-gray-50 hover:border-gray-400 transition duration-200 ease disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={page === 1}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={(isSearchMode ? search.page : page) === 1}
+              onClick={() =>
+                isSearchMode
+                  ? search.setPage((p: number) => Math.max(1, p - 1))
+                  : setPage((p) => Math.max(1, p - 1))
+              }
             >
               Prev
             </button>
 
-            <button className="px-3 py-1 min-w-9 min-h-9 text-sm font-normal text-white bg-gray-800 border border-gray-800 rounded">
-              {page}
-            </button>
+            <button>{isSearchMode ? search.page : page}</button>
 
             <button
-              className="px-3 py-1 min-w-9 min-h-9 text-sm font-normal text-gray-500 bg-white border border-gray-200 rounded hover:bg-gray-50 hover:border-gray-400 transition duration-200 ease disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={displayOrders.length < limit}
-              onClick={() => setPage((p) => p + 1)}
+              onClick={() =>
+                isSearchMode
+                  ? search.setPage((p: number) => p + 1)
+                  : setPage((p) => p + 1)
+              }
             >
               Next
             </button>

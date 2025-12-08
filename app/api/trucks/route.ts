@@ -23,7 +23,6 @@ export async function POST(req: Request) {
     const truck = await TrucksService.create(body);
     return NextResponse.json(truck, { status: 201 });
   } catch (error) {
-    console.error("Error creating truck:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Server error" },
       { status: 500 }

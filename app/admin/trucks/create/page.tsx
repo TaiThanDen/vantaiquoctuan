@@ -62,9 +62,7 @@ export default function CreateTruckPage() {
           const data = await serviceTypesRes.json();
           setServiceTypes(data);
         }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+      } catch (error) {}
     };
 
     fetchData();
@@ -394,7 +392,6 @@ export default function CreateTruckPage() {
               <Editor
                 value={formData.description}
                 onChange={(json: any) => {
-                  console.log("EDITOR JSON:", json);
                   setFormData((f) => ({ ...f, description: json }));
                 }}
               />

@@ -94,7 +94,6 @@ export default function BookingForm({
       setFrom("");
       setTo("");
     } catch (error) {
-      console.error("Error:", error);
       toast.error(
         `Có lỗi xảy ra: ${
           error instanceof Error ? error.message : "Vui lòng thử lại!"

@@ -71,4 +71,26 @@ export const OrderQueries = {
     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
     RETURNING *;
   `,
+  search: `
+  SELECT 
+    o.*,
+    st.name AS service_type_name,
+    t.name AS truck_name,
+    t.models AS truck_model,
+    t.load AS truck_load,
+    t.load_unit AS truck_load_unit,
+    t.license_plate AS truck_license_plate
+  FROM orders o
+  LEFT JOIN service_types st ON o.service_type_id = st.id
+  LEFT JOIN trucks t ON o.truck_id = t.id
+  WHERE
+    o.customer_name ILIKE $1
+    OR o.customer_phone ILIKE $1
+    OR o.from_location ILIKE $1
+    OR o.to_location ILIKE $1
+    OR st.name ILIKE $1
+  ORDER BY o.create_at DESC
+  LIMIT $2 OFFSET $3;
+`,
+
 };

@@ -27,12 +27,10 @@ export class OrderClientService {
     try {
       result = text ? JSON.parse(text) : {};
     } catch (e) {
-      console.error("JSON parse error:", e);
       throw new Error("Server không trả về dữ liệu hợp lệ");
     }
 
     if (!response.ok) {
-      console.error("Server error:", result);
       throw new Error(result.error || "Failed to create order");
     }
 
@@ -83,4 +81,16 @@ export class OrderClientService {
     if (!response.ok) throw new Error(json?.error || "Failed to delete order");
     return json;
   }
+  static async search(query: string, limit = 10, offset = 0) {
+    const response = await fetch(
+      `/api/orders/search?query=${encodeURIComponent(query)}&limit=${limit}&offset=${offset}`,
+      { cache: "no-store" }
+    );
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data?.error || "Failed to search orders");
+    }
+    return data;
+  }
+
 }

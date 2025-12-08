@@ -66,9 +66,7 @@ export default function EditTruckPage() {
           const data = await serviceTypesRes.json();
           setServiceTypes(data);
         }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+      } catch (error) {}
     };
 
     fetchData();

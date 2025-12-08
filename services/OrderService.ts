@@ -54,4 +54,12 @@ export class OrderService {
     const result = await db.query(OrderQueries.delete, [id]);
     return result.rows[0] ?? null;
   }
+  static async search(query: string, limit = 10, offset = 0) {
+    const q = (query ?? "").trim();
+    if (!q) return [];
+    const searchQuery = `%${q}%`;
+    const result = await db.query(OrderQueries.search, [searchQuery, limit, offset]);
+    return result.rows;
+  }
+
 }

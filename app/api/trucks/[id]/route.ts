@@ -24,7 +24,6 @@ export async function GET(
     }
     return NextResponse.json(truck);
   } catch (error) {
-    console.error("Error fetching truck:", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
@@ -50,7 +49,6 @@ export async function PUT(
 
     return NextResponse.json(updatedTruck);
   } catch (error) {
-    console.error("Error updating truck:", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
@@ -73,7 +71,6 @@ export async function DELETE(
     }
     return NextResponse.json({ message: "Truck deleted successfully", truck: deletedTruck });
   } catch (error) {
-    console.error("Error deleting truck:", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

@@ -1,11 +1,5 @@
-"use client";
-
-import { useState } from "react";
-import { IoChevronDown, IoChevronUp } from "react-icons/io5";
 import { FiClock } from "react-icons/fi";
 import { LuTruck, LuPackageOpen } from "react-icons/lu";
-import { TbArrowsRight } from "react-icons/tb";
-import { MdOutlineAltRoute } from "react-icons/md";
 import { FaWeightHanging } from "react-icons/fa";
 
 interface TripCardProps {
@@ -27,14 +21,12 @@ interface TripCardProps {
   truckLicensePlate?: string | null;
 }
 
-// Helper function to truncate address
 const truncateAddress = (address: string, maxLength: number = 50) => {
   if (address.length <= maxLength) return address;
   return address.substring(0, maxLength) + "...";
 };
 
 export default function TripCard({
-  orderId,
   from,
   to,
   serviceType,

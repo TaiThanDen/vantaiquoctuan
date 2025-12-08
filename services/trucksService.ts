@@ -43,7 +43,6 @@ export class TrucksService {
       try {
         truck.description = JSON.parse(truck.description);
       } catch {
-        // Nếu không phải JSON, giữ nguyên
       }
     }
     return truck;

@@ -13,7 +13,6 @@ export async function GET(
         }
         return NextResponse.json(order);
     } catch (err) {
-        console.error(err);
         return NextResponse.json({ error: "Server error" }, { status: 500 });
     }
 }
@@ -31,7 +30,6 @@ export async function PUT(
         }
         return NextResponse.json(order);
     } catch (err) {
-        console.error(err);
         return NextResponse.json({ error: "Server error" }, { status: 500 });
     }
 }
@@ -47,7 +45,6 @@ export async function DELETE(
         }
         return NextResponse.json(order);
     } catch (err) {
-        console.error(err);
         return NextResponse.json({ error: "Server error" }, { status: 500 });
     }
 }

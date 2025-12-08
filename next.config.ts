@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       // thêm các domain khác nếu cần
     ],
   },
+  productionBrowserSourceMaps: false,
 };
 
 export default nextConfig;

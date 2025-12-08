@@ -73,7 +73,6 @@ const NewsDetailPage = () => {
   const contentAreaRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
-  // Configure DOMPurify - MOVED INSIDE COMPONENT
   useEffect(() => {
     if (typeof window !== "undefined") {
       DOMPurify.addHook("uponSanitizeAttribute", (_: any, data: any) => {
@@ -140,7 +139,6 @@ const NewsDetailPage = () => {
       .replace(/\s+/g, "-");
   };
 
-  // Chuyển TipTap JSON sang HTML - Memoize để tránh re-render
   const tiptapHtml = useMemo(() => {
     if (!article?.content) return "";
 
@@ -158,12 +156,10 @@ const NewsDetailPage = () => {
         Superscript,
       ]);
     } catch (error) {
-      console.error("Error generating HTML:", error);
       return "";
     }
   }, [article?.content]);
 
-  // Sau đó sanitize - Memoize để tránh re-sanitize
   const safeHtml = useMemo(() => {
     if (!tiptapHtml) return "";
 
@@ -341,8 +337,6 @@ const NewsDetailPage = () => {
 
         setRelatedNews(filtered);
       } catch (error) {
-        console.error("Error fetching related news:", error);
-        // Nếu có lỗi, vẫn set empty array để không crash
         setRelatedNews([]);
       }
     };

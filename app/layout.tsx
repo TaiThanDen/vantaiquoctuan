@@ -16,14 +16,14 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title:
-    "Vận Tải Quốc Tuấn - Dịch Vụ Vận Chuyển Chuyên Nghiệp | Chuyển Nhà, Hàng Tấn",
+    "Vận Tải Tuấn Hải  - Dịch Vụ Vận Chuyển Chuyên Nghiệp | Chuyển Nhà, Hàng Tấn",
   description:
-    "Vận Tải Quốc Tuấn - Đơn vị vận chuyển uy tín với hơn 20 năm kinh nghiệm. Chuyên vận chuyển hàng công nghiệp, chuyển nhà trọn gói, hàng tải trọng lớn (>2 tấn). Đội xe đa dạng từ 500kg đến 30 tấn. Phục vụ 24/7, an toàn - nhanh chóng - đúng hẹn.",
+    "Vận Tải Tuấn Hải  - Đơn vị vận chuyển uy tín với hơn 20 năm kinh nghiệm. Chuyên vận chuyển hàng công nghiệp, chuyển nhà trọn gói, hàng tải trọng lớn (>2 tấn). Đội xe đa dạng từ 500kg đến 30 tấn. Phục vụ 24/7, an toàn - nhanh chóng - đúng hẹn.",
   keywords:
     "vận tải, vận chuyển hàng hóa, chuyển nhà, chuyển văn phòng, vận chuyển hàng công nghiệp, xe tải, thuê xe tải, vận chuyển nội thành, vận chuyển liên tỉnh, vận chuyển hàng nặng, logistics",
-  authors: [{ name: "Vận Tải Quốc Tuấn" }],
+  authors: [{ name: "Vận Tải Tuấn Hải " }],
   openGraph: {
-    title: "Vận Tải Quốc Tuấn - Vận Chuyển Chuyên Nghiệp",
+    title: "Vận Tải Tuấn Hải  - Vận Chuyển Chuyên Nghiệp",
     description:
       "Đơn vị vận tải uy tín chuyên vận chuyển hàng công nghiệp, chuyển nhà, hàng tải trọng lớn. Đội xe đa dạng, phục vụ 24/7.",
     type: "website",

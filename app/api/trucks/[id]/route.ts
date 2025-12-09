@@ -19,12 +19,16 @@ export async function GET(
       ? await TrucksService.getById(id)
       : await TrucksService.getBySlug(id);
 
+    console.log('Truck found:', !!truck);
+
     if (!truck) {
       return NextResponse.json({ error: "Truck not found" }, { status: 404 });
     }
     return NextResponse.json(truck);
   } catch (error) {
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json({
+      error: error instanceof Error ? error.message : "Server error"
+    }, { status: 500 });
   }
 }
 

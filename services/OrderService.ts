@@ -1,4 +1,3 @@
-import { getNewsBySlug } from './newsService';
 import { db } from "@/lib/db";
 import { OrderQueries } from "@/lib/queries/orders";
 

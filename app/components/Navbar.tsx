@@ -8,7 +8,7 @@ import logo from "@/public/assets/logo_remove_bg-cropped.svg";
 const links = [
   { title: "Home", href: "/" },
   { title: "Lịch đặt xe", href: "/order" },
-  { title: "Danh mục xe", href: "/cars" },
+  { title: "Danh mục xe", href: "/trucks" },
   { title: "Tin tức", href: "/news" },
 ];
 
@@ -16,7 +16,10 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [isTop, setIsTop] = useState(true);
   const pathname = usePathname();
-  const isLandingOrNews = pathname === "/" || pathname.startsWith("/news");
+  const isLandingOrNews =
+    pathname === "/" ||
+    pathname.startsWith("/news") ||
+    pathname.startsWith("/trucks/");
 
   useEffect(() => setOpen(false), [pathname]);
 

@@ -10,7 +10,7 @@ export default function Footer() {
             <a href="/" className="flex items-center">
               <Image src={logo} alt="Logo" width={200} />
               {/* <span className="self-center text-2xl font-semibold whitespace-nowrap">
-                Vận Tải Quốc Tuấn
+                Vận Tải Tuấn Hải 
               </span> */}
             </a>
           </div>
@@ -81,7 +81,7 @@ export default function Footer() {
           <span className="text-sm text-gray-500 sm:text-center">
             © 2025{" "}
             <a href="/" className="hover:underline">
-              Vận Tải Quốc Tuấn
+              Vận Tải Tuấn Hải
             </a>
             . All Rights Reserved.
           </span>

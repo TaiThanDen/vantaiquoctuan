@@ -11,8 +11,16 @@ export default function TruckCard({ truck }: TruckCardProps) {
       ? truck.images[0].url
       : "/assets/truck-placeholder.jpeg";
 
+  const linkHref = truck.slug || truck.id;
+  console.log("TruckCard:", {
+    name: truck.name,
+    slug: truck.slug,
+    id: truck.id,
+    linkHref,
+  });
+
   return (
-    <Link href={`/cars/${truck.id}`}>
+    <Link href={`/trucks/${linkHref}`}>
       <div className="w-full bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 border border-gray-100 overflow-hidden cursor-pointer">
         {/* Image Section */}
         <div className="relative h-48 w-full bg-gray-200">
@@ -57,7 +65,7 @@ export default function TruckCard({ truck }: TruckCardProps) {
           <div className="mt-3">
             <span
               className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                truck.status === "available"
+                truck.status === "active"
                   ? "bg-green-100 text-green-700"
                   : truck.status === "in_use"
                   ? "bg-yellow-100 text-yellow-700"

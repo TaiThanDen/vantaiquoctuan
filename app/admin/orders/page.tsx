@@ -370,6 +370,7 @@ export default function OrdersPage() {
 
           <div className="flex space-x-1">
             <button
+              className="px-3 py-1 min-w-9 min-h-9 text-sm font-normal text-gray-500 bg-white border border-gray-200 rounded hover:bg-gray-50 hover:border-gray-400 transition duration-200 ease"
               disabled={(isSearchMode ? search.page : page) === 1}
               onClick={() =>
                 isSearchMode
@@ -380,9 +381,12 @@ export default function OrdersPage() {
               Prev
             </button>
 
-            <button>{isSearchMode ? search.page : page}</button>
+            <button className="px-3 py-1 min-w-9 min-h-9 text-sm font-normal text-white bg-gray-800 border border-gray-800 rounded hover:bg-gray-600 hover:border-gray-600 transition duration-200 ease">
+              {isSearchMode ? search.page : page}
+            </button>
 
             <button
+              className="px-3 py-1 min-w-9 min-h-9 text-sm font-normal text-gray-500 bg-white border border-gray-200 rounded hover:bg-gray-50 hover:border-gray-400 transition duration-200 ease"
               disabled={displayOrders.length < limit}
               onClick={() =>
                 isSearchMode

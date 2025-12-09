@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { VscThreeBars } from "react-icons/vsc";
 import { useRouter } from "next/navigation";
+import { h } from "@tiptap/core";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -19,10 +20,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const menuItems = [
     { href: "/admin", label: "Dashboard", icon: "📊" },
+    { href: "/admin/truck-types", label: "Quản lý thể loại xe", icon: "🚚" },
     { href: "/admin/trucks", label: "Quản lý xe", icon: "🚛" },
+    { href: "/admin/service-types", label: "Quản lý loại dịch vụ", icon: "🛠️" },
     { href: "/admin/orders", label: "Quản lý đơn hàng", icon: "📦" },
     { href: "/admin/news", label: "Quản lý tin tức", icon: "📰" },
-    { href: "/admin/users", label: "Quản lý người dùng", icon: "👥" },
   ];
 
   // Hàm xử lý logout

@@ -37,7 +37,7 @@ export default function CreateTruckPage() {
     color: "",
     owner_name: "",
     owner_phone: "",
-    status: "available",
+    status: "active",
     registration_expiry: "",
     truck_type_ids: [] as string[],
     service_type_ids: [] as string[],
@@ -365,7 +365,7 @@ export default function CreateTruckPage() {
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff4500] focus:border-transparent"
                 >
-                  <option value="available">Sẵn sàng</option>
+                  <option value="active">Sẵn sàng</option>
                   <option value="in_use">Đang sử dụng</option>
                   <option value="maintenance">Bảo trì</option>
                 </select>

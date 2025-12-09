@@ -14,4 +14,12 @@ export const TrucksServiceTypesQueries = {
         VALUES (uuid_generate_v4(), $1, $2, NOW())
         RETURNING *;
     `,
+    getAll: `
+        SELECT 
+            tst.*,
+            st.name AS service_type_name
+        FROM truck_service_types tst
+        JOIN service_types st ON tst.service_type_id = st.id
+        ORDER BY tst.created_at DESC;
+    `,
 };

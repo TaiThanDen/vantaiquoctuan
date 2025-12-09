@@ -1,5 +1,5 @@
-import {db} from "@/lib/db";
-import {ServiceTypeQueries} from "@/lib/queries/service";
+import { db } from "@/lib/db";
+import { ServiceTypeQueries } from "@/lib/queries/service";
 
 export class ServiceTypeService {
     static async getAll() {

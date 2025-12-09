@@ -88,7 +88,7 @@ export default function StatsSection() {
         <h2 className="text-4xl md:text-5xl font-medium leading-snug text-neutral-900">
           Con số ấn tượng của
           <br />
-          Vận Tải Quốc Tuấn
+          Vận Tải Tuấn Hải
         </h2>
       </div>
 

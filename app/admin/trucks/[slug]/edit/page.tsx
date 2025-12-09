@@ -42,7 +42,7 @@ export default function EditTruckPage() {
     color: "",
     owner_name: "",
     owner_phone: "",
-    status: "available",
+    status: "active",
     registration_expiry: "",
     truck_type_ids: [] as string[],
     service_type_ids: [] as string[],
@@ -86,7 +86,7 @@ export default function EditTruckPage() {
         color: truck.color || "",
         owner_name: truck.owner_name || "",
         owner_phone: truck.owner_phone || "",
-        status: truck.status || "available",
+        status: truck.status || "active",
         registration_expiry: truck.registration_expiry || "",
         truck_type_ids: truck.truck_types?.map((t: any) => t.id) || [],
         service_type_ids: truck.service_types?.map((s: any) => s.id) || [],
@@ -382,15 +382,16 @@ export default function EditTruckPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Trạng thái
+                  Trạng thái <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="status"
                   value={formData.status}
                   onChange={handleInputChange}
+                  required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff4500] focus:border-transparent"
                 >
-                  <option value="available">Sẵn sàng</option>
+                  <option value="active">Sẵn sàng</option>
                   <option value="in_use">Đang sử dụng</option>
                   <option value="maintenance">Bảo trì</option>
                 </select>

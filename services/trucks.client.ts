@@ -1,5 +1,6 @@
 export interface Truck {
     id: string;
+    slug: string;
     name: string;
     models: string;
     brand: string;

@@ -286,7 +286,7 @@ export default function AdminTrucksPage() {
                     </td>
                     <td className="p-4 py-5 text-sm font-medium">
                       <Link
-                        href={`/cars/${truck.id}`}
+                        href={`/trucks/${truck.id}`}
                         className="text-[#ff4500] hover:text-[#e63e00] mr-3"
                       >
                         Xem

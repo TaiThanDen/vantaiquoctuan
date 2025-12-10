@@ -1,50 +1,78 @@
-name: Deploy Next.js to VPS
+name: Deploy Next.js to VPS (Nginx + PM2)
 
 on:
   push:
     branches: [main]
 
+concurrency:
+  group: deploy-main
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Setup SSH
         shell: bash
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          HOST: ${{ secrets.HOST }}
         run: |
           set -e
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+
+          # Write private key safely (keep newlines)
+          printf "%s\n" "$SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
-          # (khuyến nghị) tách PORT thành secret riêng, mặc định 22 nếu bạn không tạo secret
-          PORT="${{ secrets.PORT }}"
-          if [ -z "$PORT" ]; then PORT=22; fi
+          # Add host key (port 22)
+          ssh-keyscan -p 22 -H "$HOST" >> ~/.ssh/known_hosts || true
 
-          ssh-keyscan -p "$PORT" -H "${{ secrets.HOST }}" >> ~/.ssh/known_hosts
+          # Validate key format (won't leak key)
+          ssh-keygen -lf ~/.ssh/id_ed25519
 
       - name: Deploy to VPS
         shell: bash
         env:
           HOST: ${{ secrets.HOST }}
           USER: ${{ secrets.USER }}
-          PORT: ${{ secrets.PORT }}
           PROJECT_DIR: ${{ secrets.PROJECT_DIR }}
         run: |
           set -e
-          if [ -z "$PORT" ]; then PORT=22; fi
+
+          APP_NAME="vantaituanhai"
+
+          REMOTE_CMD="set -e;
+            cd '$PROJECT_DIR';
+
+            echo '==> PWD:'; pwd;
+            echo '==> Pull main...';
+            git fetch --all;
+            git checkout main;
+            git reset --hard origin/main;
+
+            echo '==> Install deps...';
+            npm ci || npm install;
+
+            echo '==> Build...';
+            npm run build;
+
+            echo '==> Restart PM2...';
+            pm2 describe '$APP_NAME' >/dev/null 2>&1 \
+              && pm2 restart '$APP_NAME' --update-env \
+              || pm2 start npm --name '$APP_NAME' -- run start;
+
+            pm2 save || true;
+            echo '==> Done.';
+          "
 
           ssh -i ~/.ssh/id_ed25519 \
-            -p "$PORT" \
+            -p 22 \
             -o IdentitiesOnly=yes \
             -o PasswordAuthentication=no \
-            "$USER@$HOST" "
-              set -e
-              cd '$PROJECT_DIR'
-              git pull
-              npm ci || npm install
-              npm run build
-              pm2 describe vantaituanhai >/dev/null 2>&1 && pm2 restart vantaituanhai || pm2 start npm --name 'vantaituanhai' -- run start
-            "
+            -o ConnectTimeout=10 \
+            "$USER@$HOST" "$REMOTE_CMD"

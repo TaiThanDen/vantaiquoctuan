@@ -30,10 +30,8 @@ jobs:
 
           if [ -z "$PORT" ]; then PORT=22; fi
 
-          # kiểm tra key hợp lệ (không lộ key)
           ssh-keygen -lf ~/.ssh/id_ed25519
 
-          # lấy host key (retry)
           for i in 1 2 3; do
             ssh-keyscan -p "$PORT" -H "$HOST" >> ~/.ssh/known_hosts && break
             sleep 2
@@ -50,15 +48,18 @@ jobs:
           set -e
           if [ -z "$PORT" ]; then PORT=22; fi
 
+          REMOTE_CMD="set -e;
+            cd '$PROJECT_DIR';
+            git pull;
+            npm ci || npm install;
+            npm run build;
+            pm2 describe vantaituanhai >/dev/null 2>&1
+              && pm2 restart vantaituanhai
+              || pm2 start npm --name 'vantaituanhai' -- run start
+          "
+
           ssh -i ~/.ssh/id_ed25519 \
             -p "$PORT" \
             -o IdentitiesOnly=yes \
             -o PasswordAuthentication=no \
-            "$USER@$HOST" "bash -s" <<SCRIPT
-set -e
-cd "$PROJECT_DIR"
-git pull
-npm ci || npm install
-npm run build
-pm2 describe vantaituanhai >/dev/null 2>&1 && pm2 restart vantaituanhai || pm2 start npm --name "vantaituanhai" -- run start
-SCRIPT
+            "$USER@$HOST" "$REMOTE_CMD"

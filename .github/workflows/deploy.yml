@@ -4,9 +4,15 @@ on:
   push:
     branches: [main]
 
+# (khuyên dùng) chỉ chạy bản deploy mới nhất, tự hủy bản cũ khi bạn push liên tục
+concurrency:
+  group: deploy-main
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -16,14 +22,24 @@ jobs:
         run: |
           set -e
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+
+          # Ghi private key đúng format (tránh lỗi xuống dòng khi dùng echo)
+          cat > ~/.ssh/id_ed25519 <<'KEY'
+${{ secrets.SSH_KEY }}
+KEY
           chmod 600 ~/.ssh/id_ed25519
 
-          # (khuyến nghị) tách PORT thành secret riêng, mặc định 22 nếu bạn không tạo secret
           PORT="${{ secrets.PORT }}"
           if [ -z "$PORT" ]; then PORT=22; fi
 
-          ssh-keyscan -p "$PORT" -H "${{ secrets.HOST }}" >> ~/.ssh/known_hosts
+          # Optional: kiểm tra key có hợp lệ không (không lộ nội dung key)
+          ssh-keygen -lf ~/.ssh/id_ed25519
+
+          # Lấy host key (tránh fail vì mạng chập chờn)
+          for i in 1 2 3; do
+            ssh-keyscan -p "$PORT" -H "${{ secrets.HOST }}" >> ~/.ssh/known_hosts && break
+            sleep 2
+          done
 
       - name: Deploy to VPS
         shell: bash
@@ -32,13 +48,18 @@ jobs:
           PORT="${{ secrets.PORT }}"
           if [ -z "$PORT" ]; then PORT=22; fi
 
-          ssh -p "$PORT" "${{ secrets.USER }}@${{ secrets.HOST }}" << 'EOF'
-            set -e
-            cd "${{ secrets.PROJECT_DIR }}"
-            git pull
-            npm ci || npm install
-            npm run build
-            pm2 describe vantaituanhai >/dev/null 2>&1 \
-              && pm2 restart vantaituanhai \
-              || pm2 start npm --name "vantaituanhai" -- run start
-          EOF
+          ssh -i ~/.ssh/id_ed25519 \
+            -p "$PORT" \
+            -o IdentitiesOnly=yes \
+            -o PasswordAuthentication=no \
+            -o StrictHostKeyChecking=yes \
+            "${{ secrets.USER }}@${{ secrets.HOST }}" << 'EOF'
+set -e
+cd "${{ secrets.PROJECT_DIR }}"
+git pull
+npm ci || npm install
+npm run build
+pm2 describe vantaituanhai >/dev/null 2>&1 \
+  && pm2 restart vantaituanhai \
+  || pm2 start npm --name "vantaituanhai" -- run start
+EOF

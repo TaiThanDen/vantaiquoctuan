@@ -4,7 +4,6 @@ on:
   push:
     branches: [main]
 
-# (khuyên dùng) chỉ chạy bản deploy mới nhất, tự hủy bản cũ khi bạn push liên tục
 concurrency:
   group: deploy-main
   cancel-in-progress: true
@@ -19,43 +18,47 @@ jobs:
 
       - name: Setup SSH
         shell: bash
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          HOST: ${{ secrets.HOST }}
+          PORT: ${{ secrets.PORT }}
         run: |
           set -e
           mkdir -p ~/.ssh
 
-          # Ghi private key đúng format (tránh lỗi xuống dòng khi dùng echo)
-          cat > ~/.ssh/id_ed25519 <<'KEY'
-${{ secrets.SSH_KEY }}
-KEY
+          # Ghi private key ra file (an toàn YAML + giữ nguyên newline)
+          printf "%s" "$SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
-          PORT="${{ secrets.PORT }}"
           if [ -z "$PORT" ]; then PORT=22; fi
 
-          # Optional: kiểm tra key có hợp lệ không (không lộ nội dung key)
+          # Optional: kiểm tra key có hợp lệ không (không lộ key)
           ssh-keygen -lf ~/.ssh/id_ed25519
 
-          # Lấy host key (tránh fail vì mạng chập chờn)
+          # Lấy host key (retry để tránh mạng chập chờn)
           for i in 1 2 3; do
-            ssh-keyscan -p "$PORT" -H "${{ secrets.HOST }}" >> ~/.ssh/known_hosts && break
+            ssh-keyscan -p "$PORT" -H "$HOST" >> ~/.ssh/known_hosts && break
             sleep 2
           done
 
       - name: Deploy to VPS
         shell: bash
+        env:
+          HOST: ${{ secrets.HOST }}
+          USER: ${{ secrets.USER }}
+          PORT: ${{ secrets.PORT }}
+          PROJECT_DIR: ${{ secrets.PROJECT_DIR }}
         run: |
           set -e
-          PORT="${{ secrets.PORT }}"
           if [ -z "$PORT" ]; then PORT=22; fi
 
           ssh -i ~/.ssh/id_ed25519 \
             -p "$PORT" \
             -o IdentitiesOnly=yes \
             -o PasswordAuthentication=no \
-            -o StrictHostKeyChecking=yes \
-            "${{ secrets.USER }}@${{ secrets.HOST }}" << 'EOF'
+            "$USER@$HOST" << 'EOF'
 set -e
-cd "${{ secrets.PROJECT_DIR }}"
+cd "$PROJECT_DIR"
 git pull
 npm ci || npm install
 npm run build

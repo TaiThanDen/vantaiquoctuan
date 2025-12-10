@@ -4,38 +4,26 @@ on:
   push:
     branches: [main]
 
-concurrency:
-  group: deploy-main
-  cancel-in-progress: true
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Setup SSH
         shell: bash
-        env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}
-          HOST: ${{ secrets.HOST }}
-          PORT: ${{ secrets.PORT }}
         run: |
           set -e
           mkdir -p ~/.ssh
-          printf "%s" "$SSH_KEY" > ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
+          # (khuyến nghị) tách PORT thành secret riêng, mặc định 22 nếu bạn không tạo secret
+          PORT="${{ secrets.PORT }}"
           if [ -z "$PORT" ]; then PORT=22; fi
 
-          ssh-keygen -lf ~/.ssh/id_ed25519
-
-          for i in 1 2 3; do
-            ssh-keyscan -p "$PORT" -H "$HOST" >> ~/.ssh/known_hosts && break
-            sleep 2
-          done
+          ssh-keyscan -p "$PORT" -H "${{ secrets.HOST }}" >> ~/.ssh/known_hosts
 
       - name: Deploy to VPS
         shell: bash
@@ -48,18 +36,15 @@ jobs:
           set -e
           if [ -z "$PORT" ]; then PORT=22; fi
 
-          REMOTE_CMD="set -e;
-            cd '$PROJECT_DIR';
-            git pull;
-            npm ci || npm install;
-            npm run build;
-            pm2 describe vantaituanhai >/dev/null 2>&1
-              && pm2 restart vantaituanhai
-              || pm2 start npm --name 'vantaituanhai' -- run start
-          "
-
           ssh -i ~/.ssh/id_ed25519 \
             -p "$PORT" \
             -o IdentitiesOnly=yes \
             -o PasswordAuthentication=no \
-            "$USER@$HOST" "$REMOTE_CMD"
+            "$USER@$HOST" "
+              set -e
+              cd '$PROJECT_DIR'
+              git pull
+              npm ci || npm install
+              npm run build
+              pm2 describe vantaituanhai >/dev/null 2>&1 && pm2 restart vantaituanhai || pm2 start npm --name 'vantaituanhai' -- run start
+            "

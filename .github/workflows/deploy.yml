@@ -7,7 +7,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -19,15 +18,27 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H "${{ secrets.HOST }}" >> ~/.ssh/known_hosts
+
+          # (khuyến nghị) tách PORT thành secret riêng, mặc định 22 nếu bạn không tạo secret
+          PORT="${{ secrets.PORT }}"
+          if [ -z "$PORT" ]; then PORT=22; fi
+
+          ssh-keyscan -p "$PORT" -H "${{ secrets.HOST }}" >> ~/.ssh/known_hosts
 
       - name: Deploy to VPS
         shell: bash
         run: |
           set -e
-          ssh -i ~/.ssh/id_ed25519 \
-            -o IdentitiesOnly=yes \
-            -o PasswordAuthentication=no \
-            "${{ secrets.USER }}@${{ secrets.HOST }}" << 'EOF'
-              set -e
-              cd "${{ secrets.PROJECT_DIR }}"
+          PORT="${{ secrets.PORT }}"
+          if [ -z "$PORT" ]; then PORT=22; fi
+
+          ssh -p "$PORT" "${{ secrets.USER }}@${{ secrets.HOST }}" << 'EOF'
+            set -e
+            cd "${{ secrets.PROJECT_DIR }}"
+            git pull
+            npm ci || npm install
+            npm run build
+            pm2 describe vantaituanhai >/dev/null 2>&1 \
+              && pm2 restart vantaituanhai \
+              || pm2 start npm --name "vantaituanhai" -- run start
+          EOF

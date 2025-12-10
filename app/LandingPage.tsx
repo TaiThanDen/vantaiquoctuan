@@ -97,56 +97,57 @@ const EXPERT_ITEMS = [
     image:
       "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&h=600&fit=crop",
     imageAlt: "Giải pháp chuyển nhà",
-    title: "Giải pháp Chuyển Nhà Trọn Gói",
+    title: "Luôn có xe khi bạn cần ",
     label: "Quy trình A–Z | Không giới hạn tải trọng",
     description:
-      "Khác với dịch vụ van nhỏ, chúng tôi xử lý trọn quy trình cho các hộ gia đình và doanh nghiệp: khảo sát – lập kế hoạch – đóng gói – vận chuyển – bố trí. Tối ưu lộ trình, giảm thời gian, an toàn tuyệt đối.",
+      "Không cần tốn thời gian để tìm kiếm xe và lên lịch hẹn. Chúng tôi luôn có sẵn đội xe đa dạng tải trọng, sẵn sàng phục vụ mọi nhu cầu của bạn.",
     features: [
-      "Đội xe đa tải trọng (500kg–5 tấn)",
-      "Vật liệu đóng gói chuyên dụng",
-      "Bảo hiểm hàng hóa toàn chuyến",
+      "Đội xe đa tải trọng ",
+      "Quy trình trọn gói A–Z",
+      " Hỗ trợ đóng gói, tháo lắp",
     ],
   },
   {
     image:
       "https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=800&h=600&fit=crop",
-    imageAlt: "Giải pháp hàng công nghiệp",
-    title: "Giải pháp Hàng Công Nghiệp",
-    label: "2–30 tấn | Cẩu hạ & Giám sát GPS",
+    imageAlt: "Đội vận chuyển phối hợp, đảm bảo an toàn tài sản",
+    title: "An toàn tài sản — hạn chế trầy xước, thất lạc",
+    label: "Chuẩn hoá thao tác | Giảm rủi ro tối đa",
     description:
-      "Ưu thế ở năng lực tải trọng lớn và hàng cồng kềnh: máy móc, thiết bị, vật tư. Hỗ trợ cẩu hạ chuyên nghiệp, giám sát GPS real-time, quy trình kiểm soát rủi ro chặt chẽ.",
+      "Điểm khác biệt lớn nhất so với cách truyền thống là chuẩn hoá toàn bộ thao tác và kiểm soát rủi ro. Tài sản được phân loại, niêm phong; đội ngũ chịu trách nhiệm xuyên suốt",
     features: [
-      "Xe tải nặng & container",
-      "Cẩu hạ, bốc xếp an toàn",
-      "GPS realtime + checklist",
+      "Checklist thùng/ kiện hàng: dễ kiểm đếm, tránh thất lạc",
+      "Kỹ thuật bảo vệ bề mặt: chăn dày, góc chống va đập, cố định trên xe",
+      "Cam kết bồi thường rõ ràng theo điều kiện dịch vụ ",
     ],
   },
   {
     image:
       "https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=800&h=600&fit=crop",
-    imageAlt: "Giải pháp chuyển văn phòng",
-    title: "Giải pháp Chuyển Văn Phòng",
-    label: "Giảm downtime | Bảo quản hồ sơ",
+    imageAlt: "Điều phối vận hành, tối ưu chi phí và thời gian chuyển dọn",
+    title: "Tối ưu chi phí theo khối lượng — rõ giá, đúng tiến độ",
+    label: "Báo giá minh bạch | Điều phối thông minh",
     description:
-      "Thiết kế lộ trình chuyển đổi giảm gián đoạn hoạt động: phân loại – đóng gói – đánh dấu – vận chuyển – lắp đặt. Phù hợp các công ty cần di dời nhanh, gọn và an toàn.",
+      " Báo giá theo khối lượng và hạng mục thực tế (nhân sự + vật tư + quãng đường + yêu cầu đặc thù), có phương án dự phòng để đảm bảo hoàn thành đúng giờ.",
     features: [
-      "Kế hoạch theo timeline",
-      "Niêm phong tài liệu",
-      "Lắp đặt thiết bị tại điểm đến",
+      "Báo giá theo hạng mục: xe + nhân công + vật tư + lắp đặt, hạn chế phát sinh",
+      "Điều phối theo mốc giờ (vào/ra thang máy, giờ cấm tải) để không trễ",
+      "Có phương án tăng cường nhân lực/xe khi phát sinh khối lượng, vẫn giữ tiến độ",
     ],
   },
   {
     image:
       "https://images.unsplash.com/photo-1580674285054-bed31e145f59?w=800&h=600&fit=crop",
-    imageAlt: "Giải pháp liên tỉnh",
+    imageAlt:
+      "Giải pháp vận chuyển liên tỉnh linh hoạt hàng ghép hoặc xe riêng",
     title: "Giải pháp Vận Chuyển Liên Tỉnh",
     label: "Lịch xe cố định | Hàng ghép/xe riêng",
     description:
-      "Mạng lưới toàn quốc với lịch xe cố định. Linh hoạt lựa chọn hàng ghép tối ưu chi phí hoặc xe riêng cho đơn lớn, đáp ứng nhanh, minh bạch chi phí.",
+      "Mạng lưới tuyến liên tỉnh phủ rộng, có lịch xe cố định mỗi ngày. Linh hoạt chọn hàng ghép để tối ưu chi phí hoặc xe riêng cho đơn lớn/cần gấp, hạn chế phát sinh.",
     features: [
-      "Phủ sóng toàn quốc",
-      "Bảng giá minh bạch",
-      "Theo dõi hành trình",
+      "Tuyến liên tỉnh phủ rộng. Lịch xe chạy cố định mỗi ngày",
+      "Lựa chọn linh hoạt: hàng ghép tiết kiệm hoặc xe riêng giao thẳng cho đơn lớn",
+      "Báo giá theo tuyến/khối lượng, cập nhật trạng thái giao nhận",
     ],
   },
 ];

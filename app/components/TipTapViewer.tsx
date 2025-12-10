@@ -48,7 +48,7 @@ export default function TipTapViewer({ content, className }: Props) {
         }
       }
 
-      return content; // html/text
+      return content; // html/tex   t
     }
 
     return content; // JSON object

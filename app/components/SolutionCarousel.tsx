@@ -63,8 +63,8 @@ const SolutionCarousel = ({
         </h1>
         <p className="text-white/90 text-lg md:text-xl max-w-3xl z-20 mb-10">
           Tối ưu cho đơn hàng tải trọng lớn, chuyển nhà trọn gói và vận chuyển
-          doanh nghiệp. chúng tôi nổi bật với đội xe 100kg–5 tấn, quy trình
-          chuyên nghiệp từ A–Z.
+          doanh nghiệp. Chúng tôi nổi bật với đội xe đa dạng, quy trình chuyên
+          nghiệp từ A–Z.
         </p>
       </section>
 
@@ -73,7 +73,7 @@ const SolutionCarousel = ({
         <div className="flex flex-col gap-6">
           {items.map((item, idx) => (
             <div key={idx} className="bg-gray-100 rounded-2xl overflow-hidden">
-              <div className="bg-blue-500 text-white p-4 flex flex-col gap-4 rounded-2xl mx-3">
+              <div className="bg-[#055de2] text-white p-4 flex flex-col gap-4 rounded-2xl mx-3">
                 <img
                   src={item.image}
                   alt={item.imageAlt || item.title}
@@ -118,18 +118,18 @@ const SolutionCarousel = ({
                       alt={item.imageAlt || item.title}
                       className="w-full h-56 object-cover md:w-[35%] md:h-full rounded-t-2xl md:rounded-none"
                     />
-                    <div className="flex-1 bg-blue-500 text-white p-4 md:p-8 flex flex-col justify-center gap-4 md:gap-6 rounded-b-2xl md:rounded-none h-full">
-                      <h3 className="text-xl md:text-2xl font-bold">
+                    <div className="flex-1 bg-[#055de2] text-white p-4 md:p-8 flex flex-col justify-center gap-4 md:gap-6 rounded-b-2xl md:rounded-none h-full">
+                      <h3 className="text-xl md:text-3xl font-bold">
                         {item.title}
                       </h3>
-                      <p className="text-white/80 text-sm md:text-base mb-2 md:mb-4">
+                      <p className="text-white text-sm md:text-lg mb-2 md:mb-4">
                         {item.description}
                       </p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
+                      <div className="grid grid-cols-1 text-white sm:grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
                         {item.features.map((feature, i) => (
                           <div
                             key={i}
-                            className="p-2 md:p-4 border border-white/30 rounded-xl text-center text-xs md:text-base"
+                            className="p-2 md:p-4 border border-white/30 rounded-xl text-center text-sm md:text-lg"
                           >
                             {feature}
                           </div>

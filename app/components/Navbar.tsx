@@ -9,7 +9,7 @@ const links = [
   { title: "Home", href: "/" },
   { title: "Lịch đặt xe", href: "/order" },
   { title: "Danh mục xe", href: "/trucks" },
-  { title: "Tin tức", href: "/news" },
+  // { title: "Tin tức", href: "/news" },
 ];
 
 export default function Navbar() {
@@ -34,9 +34,7 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed w-full z-50 top-0 start-0 transition-colors duration-300 ${
-        !isLandingOrNews && isTop
-          ? "bg-transparent"
-          : "bg-white/30 backdrop-blur "
+        open || !isTop ? "bg-white/30 backdrop-blur" : "bg-transparent"
       }`}
     >
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-6 text-xl">
@@ -74,7 +72,7 @@ export default function Navbar() {
 
         <Link
           href="/order#booking"
-          className={`text-lg font-medium rounded-lg px-4 py-2 text-center transition-colors ${
+          className={`text-lg font-medium rounded-lg px-4 py-2 text-center  transition-colors ${
             !isLandingOrNews && isTop
               ? "bg-[#ff4500] hover:bg-[#e03e00] text-white"
               : "bg-blue-700 hover:bg-blue-800 text-white"
@@ -89,7 +87,7 @@ export default function Navbar() {
           onClick={() => setOpen((v) => !v)}
           className={`md:hidden p-2 rounded-md transition-colors ${
             isTop
-              ? "bg-transparent text-white"
+              ? "bg-transparent text-[#ff4500]"
               : "hover:bg-gray-100 text-blue-700"
           }`}
         >
@@ -99,9 +97,13 @@ export default function Navbar() {
         {/* Mobile dropdown */}
         <div
           id="mobile-nav"
-          className={`md:hidden absolute top-full left-0 w-full transition-[max-height,opacity] duration-300 ${
-            isTop ? "bg-black/80 text-white" : "bg-white/90 text-gray-900"
-          } ${open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
+          className={`md:hidden absolute top-full left-0 w-full transition-[max-height,opacity] duration-300
+            ${
+              isLandingOrNews && isTop
+                ? "bg-white/90 text-gray-900"
+                : "bg-white/90 text-gray-900"
+            }
+            ${open ? "max-h-96 opacity-100 " : "max-h-0 opacity-0"}`}
         >
           <ul className="py-2 ">
             {links.map((link) => (
@@ -109,9 +111,7 @@ export default function Navbar() {
                 <Link
                   href={link.href}
                   className={`block px-4 py-2 text-lg font-medium ${
-                    isTop
-                      ? "text-white hover:text-blue-200"
-                      : pathname === link.href
+                    pathname === link.href
                       ? "text-blue-700"
                       : "text-gray-900 hover:text-blue-700"
                   }`}

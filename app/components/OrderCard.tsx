@@ -93,9 +93,12 @@ export default function TripCard({
 
         {/* RIGHT CTA BUTTON */}
         <div className="flex flex-col justify-between items-end mt-4 lg:mt-0">
-          <button className="bg-[#ff4500] hover:bg-[#e53e00] text-white/90 font-semibold px-5 py-2 rounded-lg transition text-lg">
+          <a
+            href="/order#booking"
+            className="bg-[#ff4500] hover:bg-[#e53e00] text-white/90 font-semibold px-5 py-2 rounded-lg transition text-lg"
+          >
             Xem giá / Nhận báo giá
-          </button>
+          </a>
         </div>
       </div>
 

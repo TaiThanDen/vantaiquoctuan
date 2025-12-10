@@ -25,17 +25,13 @@ jobs:
         run: |
           set -e
           mkdir -p ~/.ssh
-
-          # Ghi private key ra file (an toàn YAML + giữ nguyên newline)
           printf "%s" "$SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
           if [ -z "$PORT" ]; then PORT=22; fi
 
-          # Optional: kiểm tra key có hợp lệ không (không lộ key)
           ssh-keygen -lf ~/.ssh/id_ed25519
 
-          # Lấy host key (retry để tránh mạng chập chờn)
           for i in 1 2 3; do
             ssh-keyscan -p "$PORT" -H "$HOST" >> ~/.ssh/known_hosts && break
             sleep 2
@@ -57,12 +53,12 @@ jobs:
             -o IdentitiesOnly=yes \
             -o PasswordAuthentication=no \
             "$USER@$HOST" << 'EOF'
-set -e
-cd "$PROJECT_DIR"
-git pull
-npm ci || npm install
-npm run build
-pm2 describe vantaituanhai >/dev/null 2>&1 \
-  && pm2 restart vantaituanhai \
-  || pm2 start npm --name "vantaituanhai" -- run start
+            set -e
+            cd "$PROJECT_DIR"
+            git pull
+            npm ci || npm install
+            npm run build
+            pm2 describe vantaituanhai >/dev/null 2>&1 \
+              && pm2 restart vantaituanhai \
+              || pm2 start npm --name "vantaituanhai" -- run start
 EOF

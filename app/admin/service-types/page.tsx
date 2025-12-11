@@ -3,13 +3,16 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
-import { TruckTypesClient, TruckTypes } from "@/services/trucktypes.client";
+import {
+  ServiceTypesClient,
+  ServiceTypes,
+} from "@/services/serviceTypes.Client";
 import ConfirmDialog from "@/app/components/ConfirmDialog";
 
-export default function TruckTypesPage() {
+export default function ServiceTypesPage() {
   const [page, setPage] = useState(1);
   const limit = 10;
-  const [truckTypes, setTruckTypes] = useState<TruckTypes[]>([]);
+  const [serviceTypes, setServiceTypes] = useState<ServiceTypes[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [keyword, setKeyword] = useState("");
@@ -21,13 +24,17 @@ export default function TruckTypesPage() {
 
   useEffect(() => {
     setLoading(true);
-    TruckTypesClient.getAll(page, limit, keyword)
-      .then(setTruckTypes)
+    ServiceTypesClient.getAll(page, limit, keyword)
+      .then(setServiceTypes)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [page, keyword]);
 
-  const displayTruckTypes = truckTypes;
+  useEffect(() => {
+    setPage(1);
+  }, [keyword]);
+
+  const displayServiceTypes = serviceTypes;
 
   const handleDeleteClick = (id: string, name: string) => {
     setPendingDelete({ id, name });
@@ -37,17 +44,18 @@ export default function TruckTypesPage() {
   const handleConfirmDelete = async () => {
     if (!pendingDelete) return;
     setConfirmOpen(false);
-    const toastId = toast.loading("Đang xóa loại xe...");
+    const toastId = toast.loading("Đang xóa loại dịch vụ...");
     try {
-      await TruckTypesClient.deleteById(pendingDelete.id);
+      await ServiceTypesClient.deleteById(pendingDelete.id);
       toast.dismiss(toastId);
-      toast.success("Xóa loại xe thành công!");
-      // Refetch lại danh sách
-      setTruckTypes((prev) => prev.filter((t) => t.id !== pendingDelete.id));
+      toast.success("Xóa loại dịch vụ thành công!");
+      setServiceTypes((prev) => prev.filter((t) => t.id !== pendingDelete.id));
       setPendingDelete(null);
     } catch (error: any) {
       toast.dismiss(toastId);
-      toast.error(`Lỗi xóa loại xe: ${error?.message || "Đã có lỗi xảy ra"}`);
+      toast.error(
+        `Lỗi xóa loại dịch vụ: ${error?.message || "Đã có lỗi xảy ra"}`
+      );
     }
   };
 
@@ -56,8 +64,8 @@ export default function TruckTypesPage() {
       <Toaster position="top-center" />
       <ConfirmDialog
         open={confirmOpen}
-        title="Xác nhận xóa loại xe"
-        message={`Bạn có chắc chắn muốn xóa loại xe "${pendingDelete?.name}"?`}
+        title="Xác nhận xóa loại dịch vụ"
+        message={`Bạn có chắc chắn muốn xóa loại dịch vụ "${pendingDelete?.name}"?`}
         confirmText="Xóa"
         cancelText="Hủy"
         onConfirm={handleConfirmDelete}
@@ -67,12 +75,14 @@ export default function TruckTypesPage() {
         }}
       />
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Quản lý loại xe</h1>
+        <h1 className="text-3xl font-bold text-gray-800">
+          Quản lý loại dịch vụ
+        </h1>
         <Link
-          href="/admin/truck-types/create"
+          href="/admin/service-types/create"
           className="px-4 py-2 bg-[#ff4500] text-white rounded-lg hover:bg-[#e63e00]"
         >
-          + Thêm loại xe mới
+          + Thêm loại dịch vụ mới
         </Link>
       </div>
 
@@ -81,7 +91,7 @@ export default function TruckTypesPage() {
         <div>
           {keyword && (
             <span className="text-sm text-gray-500 ml-2">
-              Tìm thấy {displayTruckTypes.length} kết quả cho &quot;{keyword}
+              Tìm thấy {displayServiceTypes.length} kết quả cho &quot;{keyword}
               &quot;
             </span>
           )}
@@ -90,7 +100,7 @@ export default function TruckTypesPage() {
           <div className="w-full max-w-sm min-w-[200px] relative">
             <input
               className="bg-white w-full pr-11 h-10 pl-3 py-2 placeholder:text-gray-400 text-gray-700 text-sm border border-gray-200 rounded transition duration-200 ease focus:outline-none focus:border-gray-400 hover:border-gray-400 shadow-sm focus:shadow-md"
-              placeholder="Tìm kiếm loại xe..."
+              placeholder="Tìm kiếm loại dịch vụ..."
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
             />
@@ -157,7 +167,7 @@ export default function TruckTypesPage() {
               </th>
               <th className="p-4 border-b border-gray-200 bg-gray-50 whitespace-nowrap">
                 <span className="text-sm font-normal leading-none text-gray-500">
-                  Tên loại xe
+                  Tên loại dịch vụ
                 </span>
               </th>
               <th className="p-4 border-b border-gray-200 bg-gray-50 whitespace-nowrap">
@@ -180,16 +190,16 @@ export default function TruckTypesPage() {
                   Lỗi tải dữ liệu: {error}
                 </td>
               </tr>
-            ) : displayTruckTypes.length === 0 ? (
+            ) : displayServiceTypes.length === 0 ? (
               <tr>
                 <td colSpan={3} className="p-8 text-center text-gray-500">
                   {keyword.trim()
-                    ? "Không tìm thấy loại xe nào phù hợp"
-                    : "Chưa có loại xe nào"}
+                    ? "Không tìm thấy loại dịch vụ nào phù hợp"
+                    : "Chưa có loại dịch vụ nào"}
                 </td>
               </tr>
             ) : (
-              displayTruckTypes.map((type, idx) => (
+              displayServiceTypes.map((type, idx) => (
                 <tr
                   key={type.id}
                   className="hover:bg-gray-50 border-b border-gray-200"
@@ -203,7 +213,7 @@ export default function TruckTypesPage() {
                   <td className="p-4 py-5 text-sm font-medium whitespace-nowrap">
                     <div className="flex items-center gap-3">
                       <Link
-                        href={`/admin/truck-types/${type.id}/edit`}
+                        href={`/admin/service-types/${type.id}/edit`}
                         className="text-blue-600 hover:text-blue-900"
                       >
                         Sửa
@@ -228,7 +238,7 @@ export default function TruckTypesPage() {
             Hiển thị{" "}
             <b>
               {(page - 1) * limit + 1}-
-              {(page - 1) * limit + displayTruckTypes.length}
+              {(page - 1) * limit + displayServiceTypes.length}
             </b>
           </div>
           <div className="flex space-x-1">
@@ -244,7 +254,7 @@ export default function TruckTypesPage() {
             </button>
             <button
               className="px-3 py-1 min-w-9 min-h-9 text-sm font-normal text-gray-500 bg-white border border-gray-200 rounded hover:bg-gray-50 hover:border-gray-400 transition duration-200 ease"
-              disabled={displayTruckTypes.length < limit}
+              disabled={displayServiceTypes.length < limit}
               onClick={() => setPage((p) => p + 1)}
             >
               Next

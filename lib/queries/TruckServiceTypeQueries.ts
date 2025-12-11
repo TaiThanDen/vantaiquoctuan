@@ -1,3 +1,5 @@
+import { get } from "http";
+
 export const TrucksServiceTypesQueries = {
     getAllByTruckId: `
         SELECT tst.*, st.name AS service_type_name

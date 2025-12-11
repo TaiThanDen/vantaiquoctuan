@@ -8,10 +8,10 @@ export const TruckTruckTypes = {
 `,
 
     insert: `
-    INSERT INTO truck_service_types (
-     id, truck_id, service_type_id, created_at
+    INSERT INTO truck_types (
+     id, name, created_at, is_deleted
     )
-    VALUES (uuid_generate_v4(), $1, $2, NOW())
+    VALUES (uuid_generate_v4(), $1, NOW(), false)
     RETURNING *;
 `,
     getAll: `
@@ -31,4 +31,10 @@ export const TruckTruckTypes = {
         FROM truck_types
         WHERE id = $1 AND is_deleted = false;
     `,
+    update: `
+        UPDATE truck_types
+        SET name = $2
+        WHERE id = $1 AND is_deleted = false
+        RETURNING *;
+    `
 };

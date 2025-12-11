@@ -38,3 +38,30 @@ export async function DELETE(_req: NextRequest, context: Ctx) {
         return NextResponse.json({ error: error?.message || "Server error" }, { status: 500 });
     }
 }
+export async function PUT(request: Request, context: { params: { id: string } } | { params: Promise<{ id: string }> }) {
+    try {
+        const p: any = (context as any).params;
+        const params = typeof p?.then === "function" ? await p : p;
+        const id = params?.id;
+        const { name } = await request.json();
+        if (!name || typeof name !== "string") {
+            return NextResponse.json(
+                { error: "Tên loại xe không hợp lệ" },
+                { status: 400 }
+            );
+        }
+        const updatedTruckType = await TruckTypesService.update(id, name);
+        if (!updatedTruckType) {
+            return NextResponse.json(
+                { error: "Loại xe không tồn tại" },
+                { status: 404 }
+            );
+        }
+        return NextResponse.json(updatedTruckType);
+    } catch (error) {
+        return NextResponse.json(
+            { error: error instanceof Error ? error.message : "Server error" },
+            { status: 500 }
+        );
+    }
+}

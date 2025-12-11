@@ -11,7 +11,7 @@ import NewsSection from "./components/news/NewsSection";
 const stickyImageSections = [
   {
     image:
-      "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1600&auto=format&fit=crop",
+      "https://thaolapnoithat.com/uploads/images/san-pham/chuyen-nha/chuyen-nha.jpg",
     children: (
       <div className="mb-10">
         <h1 className="text-3xl text-bold my-5 ">
@@ -38,7 +38,7 @@ const stickyImageSections = [
   },
   {
     image:
-      "https://images.unsplash.com/photo-1574943320219-553eb213f72d?q=80&w=1600&auto=format&fit=crop",
+      "https://vcdn1-kinhdoanh.vnecdn.net/2025/12/09/dsc07833-edited-1765256410-176-2766-8115-1765256503.jpg?w=0&h=0&q=100&dpr=2&fit=crop&s=cpWcRF27_TBO4K4bP8_zOg",
     children: (
       <div className="mb-10">
         <h1 className="text-3xl text-bold my-5 ">
@@ -64,8 +64,7 @@ const stickyImageSections = [
     ),
   },
   {
-    image:
-      "https://images.unsplash.com/photo-1606787366850-de6330128bfc?q=80&w=1600&auto=format&fit=crop",
+    image: "https://psl-logistics.vn/wp-content/uploads/2025/03/8-5.png",
     children: (
       <div className="mb-10">
         <h1 className="text-3xl text-bold my-5 ">
@@ -94,8 +93,7 @@ const stickyImageSections = [
 
 const EXPERT_ITEMS = [
   {
-    image:
-      "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&h=600&fit=crop",
+    image: "https://congtydatphat.com/wp-content/uploads/2020/09/DSC3305.jpg",
     imageAlt: "Giải pháp chuyển nhà",
     title: "Luôn có xe khi bạn cần ",
     label: "Quy trình A–Z | Không giới hạn tải trọng",
@@ -109,7 +107,7 @@ const EXPERT_ITEMS = [
   },
   {
     image:
-      "https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1580674285054-bed31e145f59?w=800&h=600&fit=crop",
     imageAlt: "Đội vận chuyển phối hợp, đảm bảo an toàn tài sản",
     title: "An toàn tài sản — hạn chế trầy xước, thất lạc",
     label: "Chuẩn hoá thao tác | Giảm rủi ro tối đa",
@@ -123,7 +121,7 @@ const EXPERT_ITEMS = [
   },
   {
     image:
-      "https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=800&h=600&fit=crop",
+      "https://taca.com.vn/wp-content/uploads/2022/12/Sharjah-rental-payment-1024x640-1.jpg",
     imageAlt: "Điều phối vận hành, tối ưu chi phí và thời gian chuyển dọn",
     title: "Tối ưu chi phí theo khối lượng — rõ giá, đúng tiến độ",
     label: "Báo giá minh bạch | Điều phối thông minh",
@@ -137,7 +135,7 @@ const EXPERT_ITEMS = [
   },
   {
     image:
-      "https://images.unsplash.com/photo-1580674285054-bed31e145f59?w=800&h=600&fit=crop",
+      "https://tansonnhat.vn/wp-content/uploads/2024/04/van-chuyen-hang-hoa-bang-duong-bo-2.jpg",
     imageAlt:
       "Giải pháp vận chuyển liên tỉnh linh hoạt hàng ghép hoặc xe riêng",
     title: "Giải pháp Vận Chuyển Liên Tỉnh",

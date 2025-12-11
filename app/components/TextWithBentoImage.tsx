@@ -44,7 +44,7 @@ export default function TextWithImage() {
             </div> */}
 
             {/* Brands */}
-            <div className="mt-6 lg:mt-12">
+            {/* <div className="mt-6 lg:mt-12">
               <span className="text-xs font-medium text-gray-800 uppercase">
                 Trusted by:
               </span>
@@ -188,7 +188,7 @@ export default function TextWithImage() {
                   />
                 </svg>
               </div>
-            </div>
+            </div> */}
             {/* End Brands */}
           </div>
           {/* End Col */}
@@ -198,21 +198,21 @@ export default function TextWithImage() {
               {/* Ảnh lớn (chiếm 2 hàng bên trái) */}
               <img
                 className="w-full h-full object-cover rounded-2xl row-span-2"
-                src="https://images.unsplash.com/photo-1665686376173-ada7a0031a85?auto=format&fit=crop&w=800&q=80"
+                src="https://smartlinklogistics.com.vn/wp-content/uploads/2024/01/van-chuyen-duong-bo.png"
                 alt="Air Cargo"
               />
 
               {/* Ảnh nhỏ trên bên phải */}
               <img
                 className="w-full h-full object-cover rounded-2xl"
-                src="https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=600&q=80"
+                src="https://antoanphianam.vn/upload/user/images/Cho-thue-xe-tai-va-boc-xep-650x434.jpg"
                 alt="Cargo Interior"
               />
 
               {/* Ảnh nhỏ dưới bên phải */}
               <img
                 className="w-full h-full object-cover rounded-2xl"
-                src="https://scontent.fsgn5-5.fna.fbcdn.net/v/t39.30808-6/580588459_122103468687100769_3789147338798025106_n.jpg?stp=dst-jpg_s720x720_tt6&_nc_cat=1&ccb=1-7&_nc_sid=f727a1&_nc_eui2=AeHAYoechi9fXMkwOB3zOhql_mn2UymnA7D-afZTKacDsKuy2-tgxBN802zLhVdn_Kma_7qhAeintwnz7tOKiZQv&_nc_ohc=4n1dYaqf6YwQ7kNvwF_W9cv&_nc_oc=Adl9VPOw6vljjRJJrpUdWcgs8nViO9iqKGQrsSgAL4ga5OndiudpglBBjNVV10M1iOI&_nc_zt=23&_nc_ht=scontent.fsgn5-5.fna&_nc_gid=VnLfzvl67651lTeVmZTPYQ&oh=00_AfhoszeW4YP17KdHDrbJKc0hStOrWAnJsldRYfKcUWn4qQ&oe=691A995D"
+                src="https://chothuekholanh.vn/uploads/images/boc-do-hang-hoa.jpg"
                 alt="Logistics Staff"
               />
             </div>

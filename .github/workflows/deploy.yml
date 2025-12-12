@@ -13,18 +13,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1) Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2) Setup Node để build trên runner
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20" # nếu project dùng version khác thì đổi chỗ này
+          node-version: "20"
           cache: "npm"
 
-      # 3) Cài deps + build trên GitHub Actions
       - name: Install deps & build
         env:
           NEXT_TELEMETRY_DISABLED: "1"
@@ -33,7 +30,6 @@ jobs:
           npm ci
           npm run build
 
-      # 4) Chuẩn bị SSH
       - name: Setup SSH
         shell: bash
         env:
@@ -43,17 +39,12 @@ jobs:
           set -e
           mkdir -p ~/.ssh
 
-          # ghi private key
           printf "%s\n" "$SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
-          # add host key (port 22)
           ssh-keyscan -p 22 -H "$HOST" >> ~/.ssh/known_hosts || true
-
-          # validate key (không lộ key)
           ssh-keygen -lf ~/.ssh/id_ed25519
 
-      # 5) Đóng gói & deploy lên VPS
       - name: Deploy to VPS
         shell: bash
         env:
@@ -61,24 +52,34 @@ jobs:
           USER: ${{ secrets.USER }}
           PROJECT_DIR: ${{ secrets.PROJECT_DIR }}
         run: |
-          set -e
+          set -euo pipefail
 
           APP_NAME="vantaituanhai"
           BUNDLE_NAME="vantaituanhai_bundle.tar.gz"
 
-          echo "==> Tạo bundle (không gồm .git, node_modules, .github, cache/trace)..."
-          tar -czf "$BUNDLE_NAME" \
-            --warning=no-file-changed \
+          echo "==> Tạo snapshot thư mục để đóng gói (tránh file thay đổi khi tar)..."
+          SNAPSHOT_DIR="$(mktemp -d)"
+          echo "Snapshot dir: $SNAPSHOT_DIR"
+
+          # Copy toàn bộ project sang snapshot, loại thứ không cần
+          rsync -a --delete \
             --exclude=".git" \
             --exclude=".github" \
             --exclude="node_modules" \
             --exclude=".next/cache" \
             --exclude=".next/trace" \
-            --exclude="npm-debug.log" \
-            --exclude="yarn-debug.log" \
-            --exclude="yarn-error.log" \
             --exclude="*.log" \
-            .
+            ./ "$SNAPSHOT_DIR/"
+
+          echo "==> Đóng gói bundle từ snapshot..."
+          # Tar từ snapshot sẽ ổn định, không bị "file changed as we read it"
+          (cd "$SNAPSHOT_DIR" && tar -czf "/home/runner/work/${{ github.repository }}/$BUNDLE_NAME" .) || {
+            echo "==> TAR FAILED. Debug snapshot content:"
+            ls -la "$SNAPSHOT_DIR" || true
+            echo "==> Listing .next (if exists):"
+            ls -la "$SNAPSHOT_DIR/.next" || true
+            exit 1
+          }
 
           echo "==> Upload bundle lên VPS..."
           scp -i ~/.ssh/id_ed25519 \

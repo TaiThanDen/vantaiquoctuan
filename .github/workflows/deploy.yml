@@ -13,9 +13,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1) Lấy code
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
+      # 2) Setup Node để build trên runner
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'    # nếu project dùng version khác thì đổi chỗ này
+          cache: 'npm'
+
+      # 3) Cài deps + build trên GitHub Actions
+      - name: Install deps & build
+        run: |
+          set -e
+          npm ci
+          npm run build
+
+      # 4) Chuẩn bị SSH
       - name: Setup SSH
         shell: bash
         env:
@@ -25,16 +41,17 @@ jobs:
           set -e
           mkdir -p ~/.ssh
 
-          # Write private key safely (keep newlines)
+          # ghi private key
           printf "%s\n" "$SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
-          # Add host key (port 22)
+          # add host key (port 22)
           ssh-keyscan -p 22 -H "$HOST" >> ~/.ssh/known_hosts || true
 
-          # Validate key format (won't leak key)
+          # validate key (không lộ key)
           ssh-keygen -lf ~/.ssh/id_ed25519
 
+      # 5) Đóng gói & deploy lên VPS
       - name: Deploy to VPS
         shell: bash
         env:
@@ -45,29 +62,43 @@ jobs:
           set -e
 
           APP_NAME="vantaituanhai"
+          BUNDLE_NAME="vantaituanhai_bundle.tar.gz"
 
+          echo "==> Tạo bundle (không gồm .git, node_modules, .github)..."
+          tar -czf "$BUNDLE_NAME" \
+            --exclude=".git" \
+            --exclude=".github" \
+            --exclude="node_modules" \
+            .
+
+          echo "==> Upload bundle lên VPS..."
+          scp -i ~/.ssh/id_ed25519 \
+            -P 22 \
+            -o IdentitiesOnly=yes \
+            -o PasswordAuthentication=no \
+            "$BUNDLE_NAME" "$USER@$HOST:/tmp/$BUNDLE_NAME"
+
+          echo "==> Chạy lệnh trên VPS..."
           REMOTE_CMD="set -e;
+            echo '==> Tạo thư mục dự án nếu chưa có...';
+            mkdir -p '$PROJECT_DIR';
+
+            echo '==> Giải nén bundle vào dự án...';
+            tar -xzf /tmp/$BUNDLE_NAME -C '$PROJECT_DIR' --strip-components=1;
+            rm -f /tmp/$BUNDLE_NAME;
+
             cd '$PROJECT_DIR';
 
-            echo '==> PWD:'; pwd;
-            echo '==> Pull main...';
-            git fetch --all;
-            git checkout main;
-            git reset --hard origin/main;
-
-            echo '==> Install deps...';
-            npm ci || npm install;
-
-            echo '==> Build...';
-            npm run build;
+            echo '==> Cài deps production...';
+            npm ci --omit=dev || npm install --omit=dev;
 
             echo '==> Restart PM2...';
             pm2 describe '$APP_NAME' >/dev/null 2>&1 \
               && pm2 restart '$APP_NAME' --update-env \
-              || pm2 start npm --name '$APP_NAME' -- run start;
+              || pm2 start npm --name '$APP_NAME' -- run start -- -p 3000;
 
             pm2 save || true;
-            echo '==> Done.';
+            echo '==> Deploy xong.';
           "
 
           ssh -i ~/.ssh/id_ed25519 \

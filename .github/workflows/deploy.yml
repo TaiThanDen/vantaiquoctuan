@@ -43,7 +43,7 @@ jobs:
           ssh-keyscan -p 22 -H "$HOST" >> ~/.ssh/known_hosts || true
           ssh-keygen -lf ~/.ssh/id_ed25519
 
-      - name: Deploy to VPS
+      - name: Deploy to VPS (releases + current symlink)
         shell: bash
         env:
           HOST: ${{ secrets.HOST }}
@@ -55,11 +55,8 @@ jobs:
           APP_NAME="vantaituanhai"
           BUNDLE_NAME="vantaituanhai_bundle.tar.gz"
 
-          echo "==> Workspace: $GITHUB_WORKSPACE"
-          echo "==> Tạo snapshot thư mục để đóng gói (tránh file thay đổi khi tar)..."
+          echo "==> Tạo snapshot để đóng gói..."
           SNAPSHOT_DIR="$(mktemp -d)"
-          echo "Snapshot dir: $SNAPSHOT_DIR"
-
           rsync -a --delete \
             --exclude=".git" \
             --exclude=".github" \
@@ -69,14 +66,8 @@ jobs:
             --exclude="*.log" \
             ./ "$SNAPSHOT_DIR/"
 
-          echo "==> Đóng gói bundle từ snapshot..."
-          (cd "$SNAPSHOT_DIR" && tar -czf "$GITHUB_WORKSPACE/$BUNDLE_NAME" .) || {
-            echo "==> TAR FAILED. Debug snapshot content:"
-            ls -la "$SNAPSHOT_DIR" || true
-            echo "==> Listing .next (if exists):"
-            ls -la "$SNAPSHOT_DIR/.next" || true
-            exit 1
-          }
+          echo "==> Tar bundle..."
+          (cd "$SNAPSHOT_DIR" && tar -czf "$GITHUB_WORKSPACE/$BUNDLE_NAME" .)
 
           echo "==> Upload bundle lên VPS..."
           scp -i ~/.ssh/id_ed25519 \
@@ -85,30 +76,45 @@ jobs:
             -o PasswordAuthentication=no \
             "$BUNDLE_NAME" "$USER@$HOST:/tmp/$BUNDLE_NAME"
 
-          echo "==> Chạy lệnh trên VPS..."
-          REMOTE_CMD="set -e;
+          echo "==> Deploy trên VPS..."
+          REMOTE_CMD="set -euo pipefail;
             APP_NAME='$APP_NAME';
-            PROJECT_DIR='$PROJECT_DIR';
+            BASE_DIR='$PROJECT_DIR';
             BUNDLE_NAME='$BUNDLE_NAME';
 
-            echo '==> Tạo thư mục dự án nếu chưa có...';
-            mkdir -p \"\$PROJECT_DIR\";
+            TS=\$(date +%Y%m%d%H%M%S);
+            RELEASE_DIR=\"\$BASE_DIR/releases/\$TS\";
+            CURRENT_DIR=\"\$BASE_DIR/current\";
 
-            echo '==> Giải nén bundle vào dự án...';
-            tar -xzf \"/tmp/\$BUNDLE_NAME\" -C \"\$PROJECT_DIR\" --strip-components=1;
+            echo '==> Ensure base dirs (must be writable by this SSH user)...';
+            mkdir -p \"\$BASE_DIR/releases\";
+
+            echo \"==> Create release: \$RELEASE_DIR\";
+            mkdir -p \"\$RELEASE_DIR\";
+
+            echo '==> Extract bundle to release...';
+            tar -xzf \"/tmp/\$BUNDLE_NAME\" -C \"\$RELEASE_DIR\";
             rm -f \"/tmp/\$BUNDLE_NAME\";
 
-            cd \"\$PROJECT_DIR\";
+            cd \"\$RELEASE_DIR\";
 
-            echo '==> Cài deps production...';
+            echo '==> Install production deps...';
             npm ci --omit=dev || npm install --omit=dev;
 
-            echo '==> Restart PM2...';
+            echo '==> Switch current symlink...';
+            ln -sfn \"\$RELEASE_DIR\" \"\$CURRENT_DIR\";
+
+            echo '==> Restart PM2 (run from current)...';
+            cd \"\$CURRENT_DIR\";
             pm2 describe \"\$APP_NAME\" >/dev/null 2>&1 \
               && pm2 restart \"\$APP_NAME\" --update-env \
               || pm2 start npm --name \"\$APP_NAME\" -- run start -- -p 3000;
 
             pm2 save || true;
+
+            echo '==> Cleanup old releases (keep last 5)...';
+            ls -1dt \"\$BASE_DIR/releases\"/* 2>/dev/null | tail -n +6 | xargs -r rm -rf || true;
+
             echo '==> Deploy xong.';
           "
 

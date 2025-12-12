@@ -1,12 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
+
   images: {
-    domains: [
-      "suckhoedoisong.qltns.mediacdn.vn",
-      // thêm các domain khác nếu cần
-    ],
+    domains: ["suckhoedoisong.qltns.mediacdn.vn"],
   },
+
   productionBrowserSourceMaps: false,
 };
 

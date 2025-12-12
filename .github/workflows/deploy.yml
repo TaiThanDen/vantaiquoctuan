@@ -38,10 +38,8 @@ jobs:
         run: |
           set -e
           mkdir -p ~/.ssh
-
           printf "%s\n" "$SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-
           ssh-keyscan -p 22 -H "$HOST" >> ~/.ssh/known_hosts || true
           ssh-keygen -lf ~/.ssh/id_ed25519
 
@@ -57,11 +55,11 @@ jobs:
           APP_NAME="vantaituanhai"
           BUNDLE_NAME="vantaituanhai_bundle.tar.gz"
 
+          echo "==> Workspace: $GITHUB_WORKSPACE"
           echo "==> Tạo snapshot thư mục để đóng gói (tránh file thay đổi khi tar)..."
           SNAPSHOT_DIR="$(mktemp -d)"
           echo "Snapshot dir: $SNAPSHOT_DIR"
 
-          # Copy toàn bộ project sang snapshot, loại thứ không cần
           rsync -a --delete \
             --exclude=".git" \
             --exclude=".github" \
@@ -72,8 +70,7 @@ jobs:
             ./ "$SNAPSHOT_DIR/"
 
           echo "==> Đóng gói bundle từ snapshot..."
-          # Tar từ snapshot sẽ ổn định, không bị "file changed as we read it"
-          (cd "$SNAPSHOT_DIR" && tar -czf "/home/runner/work/${{ github.repository }}/$BUNDLE_NAME" .) || {
+          (cd "$SNAPSHOT_DIR" && tar -czf "$GITHUB_WORKSPACE/$BUNDLE_NAME" .) || {
             echo "==> TAR FAILED. Debug snapshot content:"
             ls -la "$SNAPSHOT_DIR" || true
             echo "==> Listing .next (if exists):"

@@ -1,3 +1,59 @@
+name: Deploy Next.js to VPS (Nginx + PM2)
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-main
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2) Setup Node để build trên runner
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20" # nếu project dùng version khác thì đổi chỗ này
+          cache: "npm"
+
+      # 3) Cài deps + build trên GitHub Actions
+      - name: Install deps & build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: |
+          set -e
+          npm ci
+          npm run build
+
+      # 4) Chuẩn bị SSH
+      - name: Setup SSH
+        shell: bash
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          HOST: ${{ secrets.HOST }}
+        run: |
+          set -e
+          mkdir -p ~/.ssh
+
+          # ghi private key
+          printf "%s\n" "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          # add host key (port 22)
+          ssh-keyscan -p 22 -H "$HOST" >> ~/.ssh/known_hosts || true
+
+          # validate key (không lộ key)
+          ssh-keygen -lf ~/.ssh/id_ed25519
+
+      # 5) Đóng gói & deploy lên VPS
       - name: Deploy to VPS
         shell: bash
         env:
@@ -10,20 +66,19 @@
           APP_NAME="vantaituanhai"
           BUNDLE_NAME="vantaituanhai_bundle.tar.gz"
 
-          echo "==> Tạo staging dir..."
-          rm -rf .deploy_staging
-          mkdir -p .deploy_staging
-
-          echo "==> Copy source + build output vào staging..."
-          rsync -a \
-            --exclude ".git" \
-            --exclude ".github" \
-            --exclude "node_modules" \
-            --exclude ".deploy_staging" \
-            ./ .deploy_staging/
-
-          echo "==> Đóng gói từ staging (ổn định, không bị file-change)..."
-          tar -C .deploy_staging -czf "$BUNDLE_NAME" .
+          echo "==> Tạo bundle (không gồm .git, node_modules, .github, cache/trace)..."
+          tar -czf "$BUNDLE_NAME" \
+            --warning=no-file-changed \
+            --exclude=".git" \
+            --exclude=".github" \
+            --exclude="node_modules" \
+            --exclude=".next/cache" \
+            --exclude=".next/trace" \
+            --exclude="npm-debug.log" \
+            --exclude="yarn-debug.log" \
+            --exclude="yarn-error.log" \
+            --exclude="*.log" \
+            .
 
           echo "==> Upload bundle lên VPS..."
           scp -i ~/.ssh/id_ed25519 \
@@ -34,17 +89,26 @@
 
           echo "==> Chạy lệnh trên VPS..."
           REMOTE_CMD="set -e;
-            mkdir -p '$PROJECT_DIR';
-            tar -xzf /tmp/$BUNDLE_NAME -C '$PROJECT_DIR' --strip-components=0;
-            rm -f /tmp/$BUNDLE_NAME;
+            APP_NAME='$APP_NAME';
+            PROJECT_DIR='$PROJECT_DIR';
+            BUNDLE_NAME='$BUNDLE_NAME';
 
-            cd '$PROJECT_DIR';
+            echo '==> Tạo thư mục dự án nếu chưa có...';
+            mkdir -p \"\$PROJECT_DIR\";
 
+            echo '==> Giải nén bundle vào dự án...';
+            tar -xzf \"/tmp/\$BUNDLE_NAME\" -C \"\$PROJECT_DIR\" --strip-components=1;
+            rm -f \"/tmp/\$BUNDLE_NAME\";
+
+            cd \"\$PROJECT_DIR\";
+
+            echo '==> Cài deps production...';
             npm ci --omit=dev || npm install --omit=dev;
 
-            pm2 describe '$APP_NAME' >/dev/null 2>&1 \
-              && pm2 restart '$APP_NAME' --update-env \
-              || pm2 start npm --name '$APP_NAME' -- run start -- -p 3000;
+            echo '==> Restart PM2...';
+            pm2 describe \"\$APP_NAME\" >/dev/null 2>&1 \
+              && pm2 restart \"\$APP_NAME\" --update-env \
+              || pm2 start npm --name \"\$APP_NAME\" -- run start -- -p 3000;
 
             pm2 save || true;
             echo '==> Deploy xong.';
